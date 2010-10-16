@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello">Meet Jaro the adventurous bat</string>
+    <string name="app_name">Jaro</string>
+    <string name="move_me">Move Me</string>
+    <string name="new_game_text">New Game</string>
+    <string name="continue_text">Continue Previous Game</string>
+    
+    <string name="start_level_over">Start Level Over</string>
+    <string name="choose_different_level">Choose Different Level</string>
+    <string name="quit">Quit</string>
+    
+</resources>
