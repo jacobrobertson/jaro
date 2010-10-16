@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/start_level_over"
+          android:title="@string/start_level_over" android:icon="@android:drawable/ic_media_previous"/>
+    <item android:id="@+id/choose_different_level"
+          android:title="@string/choose_different_level" android:icon="@android:drawable/ic_menu_more"/>
+    <item android:id="@+id/quit"
+          android:title="@string/quit" android:icon="@android:drawable/ic_menu_close_clear_cancel"/>
+</menu>
