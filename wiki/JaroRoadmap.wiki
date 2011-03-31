@@ -1,0 +1,14 @@
+#Roadmap plan for major features
+
+The details behind the roadmap are all kept within the issues list (http://code.google.com/p/jaro/issues/list).
+This page is a summary page to show the overall roadmap plan and its pieces.
+
+
+  * Beta-1
+   * asdf
+   * asdf
+  * Beta-x
+   * Other bugs and features released iteratively if needed prior to 1.0
+  * 1.0
+  * 1.x
+   * features and bugs slated to be completed soon, but not able to fit into the 1.0 release
