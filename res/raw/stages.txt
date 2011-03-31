@@ -10,9 +10,9 @@ fs: Frogs and Spiders
   fs4
   fs5
 so: Snake-oban
-  snakoban1
-  snakoban2
   ts1
+  snakoban2
+  snakoban1
 ts: More Turtles
   ts2
   ts3
