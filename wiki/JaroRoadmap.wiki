@@ -1,14 +1,18 @@
-#Roadmap plan for major features
-
 The details behind the roadmap are all kept within the issues list (http://code.google.com/p/jaro/issues/list).
 This page is a summary page to show the overall roadmap plan and its pieces.
 
 
-  * Beta-1
-   * asdf
-   * asdf
-  * Beta-x
-   * Other bugs and features released iteratively if needed prior to 1.0
-  * 1.0
-  * 1.x
-   * features and bugs slated to be completed soon, but not able to fit into the 1.0 release
+  * Beta-1 - initial release to beta team (through android market)
+   * Primitive images to demonstrate the concept
+   * All major features functional, including menus, zooming, saving progress
+  * Beta-x - Other bugs and features released iteratively if needed prior to 1.0
+   * Additional rules ideas implemented as possible
+  * 1.0 - first true public release
+   * Professional graphics
+   * No fewer than 50 community contributed levels 
+  * 1.1
+   * priority features and bugs that were not able to fit into the 1.0 release
+  * 1.2
+   * Reworked progress measures
+   * Introduce "scores" based on number of steps taken.  For example, "obtain 3 stars for each level" kind of behavior
+   * Divide levels up by "play type".  For example, sokoban levels, minotaur levels, etc
