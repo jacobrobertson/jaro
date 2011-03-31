@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animation-list xmlns:android="http://schemas.android.com/apk/res/android"
+	android:oneshot="false"
+	android:antialias="true"
+	>
+	<item android:drawable="@drawable/snake1" android:duration="1000" />
+	<item android:drawable="@drawable/snake2" android:duration="1000" />
+	<item android:drawable="@drawable/snake3" android:duration="500" />
+	<item android:drawable="@drawable/snake4" android:duration="100" />
+	<item android:drawable="@drawable/snake5" android:duration="50" />
+	<item android:drawable="@drawable/snake4" android:duration="100" />
+	<item android:drawable="@drawable/snake3" android:duration="200" />
+	<item android:drawable="@drawable/snake2" android:duration="300" />
+</animation-list>
