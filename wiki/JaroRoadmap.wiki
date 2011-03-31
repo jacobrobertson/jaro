@@ -10,6 +10,7 @@ This page is a summary page to show the overall roadmap plan and its pieces.
   * 1.0 - first true public release
    * Professional graphics
    * No fewer than 50 community contributed levels 
+   * Help screen(s)
   * 1.1
    * priority features and bugs that were not able to fit into the 1.0 release
    * Additional community contributed levels
@@ -18,3 +19,4 @@ This page is a summary page to show the overall roadmap plan and its pieces.
    * Reworked progress measures
    * Introduce "scores" based on number of steps taken.  For example, "obtain 3 stars for each level" kind of behavior
    * Divide levels up by "play type".  For example, sokoban levels, minotaur levels, etc
+   * Sounds
