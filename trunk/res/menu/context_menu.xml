@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/choose_different_level"
+          android:title="@string/choose_different_level" android:icon="@android:drawable/ic_menu_more"/>
+    <item android:id="@+id/quit"
+          android:title="@string/quit" android:icon="@android:drawable/ic_menu_close_clear_cancel"/>
+    <item android:id="@+id/undo_button"
+          android:title="@string/undo" android:icon="@drawable/ic_menu_revert"/>
+    <item android:id="@+id/start_level_over"
+          android:title="@string/start_level_over" android:icon="@drawable/ic_menu_refresh"/>
+    <item android:id="@+id/zoom"
+          android:title="@string/zoom" android:icon="@drawable/ic_menu_zoom"/>
+</menu>
