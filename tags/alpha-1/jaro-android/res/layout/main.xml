@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:id="@+id/gallerylayout">
+
+	<com.robestone.jaro.android.CanvasView
+		android:id="@+id/canvasview"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent" /><!--
+	<com.robestone.jaro.android.MyGridView
+		android:id="@+id/gridview"
+		android:layout_margin="0dp"
+		android:padding="0dp"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:columnWidth="16dp"
+		android:numColumns="7"
+		android:verticalSpacing="0dp"
+		android:horizontalSpacing="0dp"
+		android:stretchMode="none"
+		android:gravity="fill"
+		android:layout_weight="2" />
+
+	--><com.robestone.jaro.android.GesturesOverlay
+		android:id="@+id/drawview"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent" />
+</RelativeLayout>
