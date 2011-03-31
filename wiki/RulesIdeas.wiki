@@ -1,0 +1,8 @@
+#summary Ideas for new rules, such as different types of bugs and creatures, and how they will behave.
+
+ * One way doors
+ * Turtles that can only be pushed in the direction they are looking
+  * A “switch” of some sort that turns all turtles 90 degrees
+ * Turtles that can be pushed in a row - maybe combine with above
+ * bridge - can only go over, can’t go under
+ * Ants - something about pushing ants all together to create a chain to an anthill.  Once all ants are connected, in one long chain that ends at the anthill, they all disappear.
