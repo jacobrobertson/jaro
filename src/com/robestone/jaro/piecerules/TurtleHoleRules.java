@@ -11,12 +11,12 @@ import com.robestone.jaro.Piece;
 public class TurtleHoleRules extends PieceRulesAdapter {
 
 	public static final String TURTLE_HOLE_TYPE_ID = "turtlehole";
-	public static final String TURTLE_HOLE_WITH_TURTLE_STATE = "turtlehole_with_turtle";
-	public static final String TURTLE_HOLE_EMPTY_STATE = "turtlehole_empty";
+	public static final String TURTLE_HOLE_WITH_TURTLE_STATE = "turtlehole_turtle";
+	public static final String TURTLE_HOLE_WITH_SNAKE = "turtlehole_snake";
 	
 	public TurtleHoleRules() {
 		super(TURTLE_HOLE_TYPE_ID);
-		setBlockingStateId(TURTLE_HOLE_EMPTY_STATE);
+		setBlockingStateId(TURTLE_HOLE_WITH_SNAKE);
 		setUseStateForSpriteId(true);
 	}
 	@Override
@@ -44,6 +44,6 @@ public class TurtleHoleRules extends PieceRulesAdapter {
 	}
 	public static boolean isEmptyHole(Piece p) {
 		return TURTLE_HOLE_TYPE_ID.equals(p.getType()) &&
-				TURTLE_HOLE_EMPTY_STATE.equals(p.getState());
+				TURTLE_HOLE_WITH_SNAKE.equals(p.getState());
 	}
 }

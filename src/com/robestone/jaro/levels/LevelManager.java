@@ -20,6 +20,7 @@ public class LevelManager {
 	
 	private InputStreamBuilder inputStreamBuilder;
 	private LevelParser levelParser;
+
 	private LevelPersister levelPersister;
 	
 	public LevelManager(InputStreamBuilder inputStreamBuilder, LevelParser levelParser, LevelPersister levelPersister) {
@@ -129,6 +130,9 @@ public class LevelManager {
 	public Grid getGrid(Level level) {
 		InputStream in = inputStreamBuilder.buildLevelInputStream(level.getLevelKey());
 		return levelParser.parseGrid(in);
+	}
+	public LevelParser getLevelParser() {
+		return levelParser;
 	}
 	
 }

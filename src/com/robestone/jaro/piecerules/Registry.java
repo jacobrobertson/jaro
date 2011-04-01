@@ -23,7 +23,7 @@ public class Registry {
 		pieceRules.add(new FrogRules());
 		pieceRules.add(new TurtleRules());
 		pieceRules.add(new TurtleHoleRules());
-		pieceRules.add(new SnakeRules());
+		pieceRules.add(new TurtleNestRules());
 		return pieceRules;
 	}
 	

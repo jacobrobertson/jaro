@@ -6,15 +6,25 @@ import android.content.SharedPreferences.Editor;
 
 import com.robestone.jaro.levels.LevelPersister;
 
-public class AndroidLevelPersister implements LevelPersister {
+public class JaroPreferences implements LevelPersister {
 
 	private static final String CURRENT_LEVEL = "jaro.currentLevel";
+	private static final String EULA = "jaro.eula";
 	private static final String LEVEL_UNLOCKED = "jaro.levelUnlocked.";
 	
 	private SharedPreferences sharedPreferences;
 	
-	public AndroidLevelPersister(JaroActivity activity) {
+	public JaroPreferences(JaroActivity activity) {
 		this.sharedPreferences = activity.getSharedPreferences("jaro", Context.MODE_PRIVATE);
+	}
+	
+	public boolean isEulaRead() {
+		return sharedPreferences.getBoolean(EULA, false);
+	}
+	public void setEulaRead() {
+		Editor editor = sharedPreferences.edit();
+		editor.putBoolean(EULA, true);
+		editor.commit();
 	}
 	
 	@Override
