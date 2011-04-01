@@ -75,8 +75,8 @@ public class TurtleRules extends PieceRulesAdapter {
 		if (isTurtleHole) {
 			return true;
 		}
-		boolean isSnakeHole = SnakeRules.SNAKE_TYPE_ID.equals(otherSide.getType());
-		if (isSnakeHole) {
+		boolean isTurtleNest = TurtleNestRules.TURTLE_NEST_ID.equals(otherSide.getType());
+		if (isTurtleNest) {
 			return true;
 		}
 		

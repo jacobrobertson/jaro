@@ -79,7 +79,7 @@ public class LevelParser {
 		
 		return grid;
 	}
-	private Piece parsePiece(String parseKey) {
+	public Piece parsePiece(String parseKey) {
 		for (PieceRules rules: pieceRules) {
 			Piece p = rules.parsePiece(parseKey);
 			if (p != null) {

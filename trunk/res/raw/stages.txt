@@ -9,10 +9,10 @@ fs: Frogs and Spiders
   fs3
   fs4
   fs5
-so: Snake-oban
+so: Jaro-ban
   ts1
-  snakoban2
-  snakoban1
+  turtleban2
+  turtleban1
 ts: More Turtles
   ts2
   ts3
@@ -20,6 +20,5 @@ ts: More Turtles
   ts5
   ts6
   ts7
-so2: Snake-oban II
-  snakoban3
-   
+so2: Jaro-ban II
+  turtleban3

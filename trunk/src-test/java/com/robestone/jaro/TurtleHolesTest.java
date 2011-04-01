@@ -1,5 +1,6 @@
 package com.robestone.jaro;
 
+import com.robestone.jaro.levels.LevelParser;
 import com.robestone.jaro.piecerules.TurtleHoleRules;
 import com.robestone.jaro.piecerules.TurtleRules;
 
@@ -13,7 +14,7 @@ public class TurtleHolesTest extends AbstractGameTest {
 	
 	public void testHoleBlocksJaro() {
 		initGrid(2, 
-				new Piece(TurtleHoleRules.TURTLE_HOLE_TYPE_ID, TurtleHoleRules.TURTLE_HOLE_EMPTY_STATE));
+				new Piece(TurtleHoleRules.TURTLE_HOLE_TYPE_ID, TurtleHoleRules.TURTLE_HOLE_WITH_SNAKE));
 		assertEquals(jaro, getGrid().getPiece(0, 0));
 		controller.move(Direction.right);
 		
@@ -32,7 +33,7 @@ public class TurtleHolesTest extends AbstractGameTest {
 	}
 	public void testJaroPushesTurtleIntoHole() {
 		
-		Piece hole = new Piece(TurtleHoleRules.TURTLE_HOLE_TYPE_ID, TurtleHoleRules.TURTLE_HOLE_EMPTY_STATE);
+		Piece hole = new Piece(TurtleHoleRules.TURTLE_HOLE_TYPE_ID, TurtleHoleRules.TURTLE_HOLE_WITH_SNAKE);
 		
 		initGrid(3, turtle, hole);
 		assertPiece(jaro, 0, 0);
@@ -43,5 +44,13 @@ public class TurtleHolesTest extends AbstractGameTest {
 		// both jaro and turtle will move
 		assertPiece(jaro, 1, 0);
 		assertStateAndType(TurtleHoleRules.TURTLE_HOLE_TYPE_ID, TurtleHoleRules.TURTLE_HOLE_WITH_TURTLE_STATE, 2, 0);
+	}
+	public void testParseIds() {
+		doTestParseIds("turtlenest");
+		doTestParseIds("turtlehole_snake");
+	}
+	private void doTestParseIds(String parseKey) {
+		LevelParser parser = game.getModel().getLevelManager().getLevelParser();
+		parser.parsePiece(parseKey);
 	}
 }

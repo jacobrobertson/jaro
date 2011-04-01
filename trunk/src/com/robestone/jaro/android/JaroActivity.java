@@ -11,6 +11,8 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.WebView;
+import android.widget.Button;
 import android.widget.ImageView;
 
 import com.robestone.jaro.levels.Level;
@@ -18,6 +20,8 @@ import com.robestone.jaro.levels.Stage;
 
 public class JaroActivity extends Activity {
 
+	private boolean showAllLevels = true;
+	
 	private JaroAndroidGame game;
 
 	public JaroAndroidGame getGame() {
@@ -31,23 +35,54 @@ public class JaroActivity extends Activity {
 		Object data = getLastNonConfigurationInstance();
 		if (data instanceof JaroAndroidGame) {
 			game = (JaroAndroidGame) data;
+		} else {
+			createGame();
+		}
+		if (game.isActive()) {
 			setContentView(R.layout.main);
 		} else {
-			// set up the home view
-			setContentView(R.layout.home);
-			ImageView homeImage = (ImageView) findViewById(R.id.home_image);
-			homeImage.setOnClickListener(new View.OnClickListener() {
-			    public void onClick(View v) {
-			    	startGame();
-			    }
-			});
+			// need to check preferences
+			// TODO might not be good to acquire like this?
+			final JaroPreferences prefs = new JaroPreferences(this);
+			if (prefs.isEulaRead()) {
+				showHome();
+			} else {
+				showAbout();
+			}
 		}
 	}
-	void startGame() {
+	private void createGame() {
 		JaroResources resources = new JaroResources(this);
 		game = new JaroAndroidGame(this, resources);
+	}
+	void showAbout() {
+		setContentView(R.layout.about);
+		String data = getString(R.string.about);
+		WebView aboutWeb = (WebView) findViewById(R.id.about_text);
+		aboutWeb.loadData(data, "text/html", "UTF-8");
 		
+		Button close = (Button) findViewById(R.id.close_about);
+		close.setOnClickListener(new View.OnClickListener() {
+		    public void onClick(View v) {
+				JaroPreferences prefs = new JaroPreferences(JaroActivity.this);
+		    	prefs.setEulaRead();
+		    	showHome();
+		    }
+		});
+	}
+	void showHome() {
+		// set up the home view
+		setContentView(R.layout.home);
+		ImageView homeImage = (ImageView) findViewById(R.id.home_image);
+		homeImage.setOnClickListener(new View.OnClickListener() {
+		    public void onClick(View v) {
+		    	startGame();
+		    }
+		});
+	}
+	void startGame() {
 		setContentView(R.layout.main);
+		game.setActive();
 		game.getController().startAcceptingMoves();
 	}
 
@@ -64,8 +99,23 @@ public class JaroActivity extends Activity {
 		return game;
 	}
 	@Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.context_menu, menu);
+    public boolean onPrepareOptionsMenu(Menu menu) {
+		boolean okay = super.onPrepareOptionsMenu(menu);
+		if (!okay) {
+			return false;
+		}
+		final JaroPreferences prefs = new JaroPreferences(this);
+		if (!prefs.isEulaRead()) {
+			return false;
+		}
+		int id;
+		if (game.isActive()) {
+			id = R.menu.context_menu;
+		} else {
+			id = R.menu.context_menu_home;
+		}
+		menu.clear();
+        getMenuInflater().inflate(id, menu);
         return true;
 	}
     @Override
@@ -80,6 +130,8 @@ public class JaroActivity extends Activity {
 	        case R.id.start_level_over:
 	        	game.getController().startLevelOver();
 	            return true;
+	        case R.id.choose_level:
+	        	startGame();
 	        case R.id.choose_different_level:
 	        	return showChooseStageMenu();
 	        case R.id.zoom:
@@ -95,7 +147,7 @@ public class JaroActivity extends Activity {
     	final List<Stage> stages = game.getModel().getLevelManager().getStages();
     	List<String> stageCaptions = new ArrayList<String>();
     	for (Stage stage: stages) {
-    		boolean unlocked = stage.getLevels().get(0).isUnlocked();
+    		boolean unlocked = showAllLevels || stage.getLevels().get(0).isUnlocked();
     		// TODO I want to make a better algorithm than this.  for example, if you pass
     		//		a certain percent of a stage, it unlocks the next stage
     		if (!unlocked) {
@@ -107,6 +159,7 @@ public class JaroActivity extends Activity {
     		return showChooseLevelMenu(stages.get(0));
     	} else {
     		// TODO push this logic into the level manager
+    		// TODO all strings should go to resources
     		String title = "Pick a Stage";
     		if (stageCaptions.size() < stages.size()) {
     			title = title + " (" + stageCaptions.size() + "/" + stages.size() + " unlocked)";
@@ -132,7 +185,7 @@ public class JaroActivity extends Activity {
     	List<String> levelCaptions = new ArrayList<String>();
     	int size = stage.getLevels().size();
 		for (int i = 0; i < size; i++) {
-    		boolean unlocked = stage.getLevels().get(i).isUnlocked();
+    		boolean unlocked = showAllLevels || stage.getLevels().get(i).isUnlocked();
     		if (!unlocked) {
     			break;
     		}
