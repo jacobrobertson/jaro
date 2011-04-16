@@ -56,7 +56,7 @@ public class GridView extends SurfaceView implements SurfaceHolder.Callback {
 		game.getView().setGridView(this);
 	}
 	public void clearCurrentLevel() {
-		pieceAnimations.clear();
+		pieceAnimations = new HashMap<Integer, GridView.CellInfo>();
 	}
 	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,	int height) {
@@ -185,6 +185,9 @@ public class GridView extends SurfaceView implements SurfaceHolder.Callback {
 					info.frameDrawTime = System.currentTimeMillis();
 				}
 				d = a.getFrame(info.currentFrame);
+				if (d == null) {
+					throw new IllegalStateException("Animation thread working against wrong map");
+				}
 			} 
 			if (d == null) {
 				throw new IllegalArgumentException("No sprite " + spriteKey + "/" + piece);

@@ -7,6 +7,12 @@ import java.util.Map;
 
 public class Grid {
 
+	/**
+	 * With this strategy, all pieces are unique across grids, which will help slightly
+	 * in cases where we're transitioning between two levels.
+	 */
+	private static int nextId = 0;
+	
 	private Map<Integer, List<Piece>> pieces = new HashMap<Integer, List<Piece>>();
 	private int columns;
 	private int rows;
@@ -16,13 +22,13 @@ public class Grid {
 		this.rows = rows;
 	}
 	public void initIds() {
-		int pieceId = 0;
 		for (List<Piece> list: pieces.values()) {
 			for (Piece piece: list) {
-				piece.setId(pieceId++);
+				piece.setId(nextId++);
 			}
 		}
 	}
+	
 	/**
 	 * TODO this doesn't try and be efficient at all.  There are any number of strategies to use instead of this.
 	 * The point of this method is to allow for undos.
