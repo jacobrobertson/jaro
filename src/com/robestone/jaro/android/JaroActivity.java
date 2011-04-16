@@ -11,9 +11,6 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.webkit.WebView;
-import android.widget.Button;
-import android.widget.ImageView;
 
 import com.robestone.jaro.levels.Level;
 import com.robestone.jaro.levels.Stage;
@@ -56,25 +53,29 @@ public class JaroActivity extends Activity {
 		game = new JaroAndroidGame(this, resources);
 	}
 	void showAbout() {
-		setContentView(R.layout.about);
-		String data = getString(R.string.about);
-		WebView aboutWeb = (WebView) findViewById(R.id.about_text);
-		aboutWeb.loadData(data, "text/html", "UTF-8");
+		CharSequence aboutMessageText = getResources().getText(R.string.about);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage(aboutMessageText);
 		
-		Button close = (Button) findViewById(R.id.close_about);
-		close.setOnClickListener(new View.OnClickListener() {
-		    public void onClick(View v) {
+		String closeAbout = getString(R.string.close_about);
+		DialogInterface.OnClickListener closeAboutClick = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
 				JaroPreferences prefs = new JaroPreferences(JaroActivity.this);
 		    	prefs.setEulaRead();
 		    	showHome();
 		    }
-		});
+		};
+		builder.setPositiveButton(closeAbout, closeAboutClick);
+
+		AlertDialog dialog = builder.create();
+		dialog.show();
 	}
 	void showHome() {
 		// set up the home view
 		setContentView(R.layout.home);
-		ImageView homeImage = (ImageView) findViewById(R.id.home_image);
-		homeImage.setOnClickListener(new View.OnClickListener() {
+		View homeView = findViewById(R.id.home_image);
+		homeView.setOnClickListener(new View.OnClickListener() {
 		    public void onClick(View v) {
 		    	startGame();
 		    }
