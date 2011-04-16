@@ -14,4 +14,4 @@ Right now, version 1 of the level maker consists of following these steps on you
  * Add columns, rows; move icons around.
  * Look here for all the existing levels - this will show you how to do things.
   * http://code.google.com/p/jaro/source/browse
- * When you're done [http://code.google.com/p/jaro/issues/list submit a new ticket] and attach your new level html file to that ticket.  Your level will be reviewed, and hopefully added to Jaro in the right stage.
+ * When you're done [http://code.google.com/p/jaro/issues/entry submit a new ticket] and attach your new level html file to that ticket.  Your level will be reviewed, and hopefully added to Jaro in the right stage.
