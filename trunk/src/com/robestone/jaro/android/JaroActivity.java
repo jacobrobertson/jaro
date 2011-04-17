@@ -17,7 +17,7 @@ import com.robestone.jaro.levels.Stage;
 
 public class JaroActivity extends Activity {
 
-	private boolean showAllLevels = true;
+	private boolean showAllLevels = false;
 	
 	private JaroAndroidGame game;
 
