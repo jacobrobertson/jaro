@@ -1,1 +1,0 @@
-copy C:\Users\jacob\banyan-clean\jaro\signed\jaro.apk K:\download
