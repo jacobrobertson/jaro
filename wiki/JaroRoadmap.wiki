@@ -1,4 +1,4 @@
-The details behind the roadmap are all kept within the issues list (http://code.google.com/p/jaro/issues/list).
+The details behind the roadmap are all kept within the [http://code.google.com/p/jaro/issues/list issues list].
 This page is a summary page to show the overall roadmap plan and its pieces.
 
 
