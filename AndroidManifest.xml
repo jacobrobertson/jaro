@@ -5,6 +5,7 @@
       package="com.robestone.jaro.android" 
       android:installLocation="auto"
       android:minSdkVersion="6">
+	<uses-sdk android:minSdkVersion="6" /> 
     <application android:icon="@drawable/icon" android:label="@string/app_name">
         <activity android:name=".JaroActivity"
                   android:label="@string/app_name"
