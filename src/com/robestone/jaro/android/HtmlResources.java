@@ -2,11 +2,12 @@ package com.robestone.jaro.android;
 
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import android.util.Log;
 
 import com.robestone.jaro.Grid;
 import com.robestone.jaro.Piece;
@@ -33,6 +34,7 @@ public class HtmlResources extends JaroAndroidResources {
 
 	@Override
 	public Iterable<Stage> getStages() {
+		Log.i("HtmlResources", "getStages");
 		return new StagesIterable(getSortedStageNames());
 	}
 
@@ -41,16 +43,17 @@ public class HtmlResources extends JaroAndroidResources {
 		String fileName = getSortedStageNames()[index];
 		return parseStage(fileName);
 	}
-	public String[] getSortedStageNames() {
+	private String[] getSortedStageNames() {
+		Log.i("HtmlResources", "getSortedStageNames");
 		return getSortedFileNames(JARO_ASSETS_DIR);
 	}
-	public String[] getSortedFileNames(String path) {
+	private String[] getSortedFileNames(String path) {
 		String[] fileNames = assets.list(path);
-		Arrays.sort(fileNames);
 		return fileNames;
 	}
 	@Override
 	public int getStagesCount() {
+		Log.i("HtmlResources", "getStagesCount");
 		return assets.list(JARO_ASSETS_DIR).length;
 	}
 	private static Stage parseStage(String fileName) {
@@ -68,15 +71,18 @@ public class HtmlResources extends JaroAndroidResources {
 
 	@Override
 	public Iterable<Level> getLevels(String stageKey) {
+		Log.i("HtmlResources", "getLevels:Iterable<Level>");
 		return new LevelsIterable(stageKey, getSortedLevelNames(stageKey));
 	}
 
 	@Override
 	public int getLevelsCount(String stageKey) {
+		Log.i("HtmlResources", "getLevelsCount");
 		return assets.list(JARO_ASSETS_DIR + "/" + stageKey).length;
 	}
 	
-	public String[] getSortedLevelNames(String stageKey) {
+	private String[] getSortedLevelNames(String stageKey) {
+		Log.i("HtmlResources", "getSortedLevelNames");
 		return getSortedFileNames(JARO_ASSETS_DIR + "/" + stageKey);
 	}
 
@@ -104,6 +110,7 @@ public class HtmlResources extends JaroAndroidResources {
 	}
 
 	public Grid parseGrid(String data, Level level) {
+		Log.i("HtmlResources", "getGrid");
 		String html = cleanHtml(data);
 		return parseGrid(html);
 	}
