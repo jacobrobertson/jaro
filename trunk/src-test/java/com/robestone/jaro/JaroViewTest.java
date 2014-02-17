@@ -4,16 +4,25 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import com.robestone.jaro.android.HtmlResources;
+import com.robestone.jaro.levels.JaroAssets;
+import com.robestone.jaro.piecerules.JaroRules;
+
 public class JaroViewTest extends TestCase {
 
 	public void testLandscape() {
-		JaroGame game = new JaroGame(new JaroModel(), new JaroView(), new JaroController(),
-				new LevelManagerTest(), new LevelManagerTest());
+		
+		JaroAssets assets = new JaroFileAssets("src-test/resources");
+		HtmlResources resources = new HtmlResources(assets);
+		
+		JaroGame game = new JaroGame(new JaroModel(resources), new JaroView(), new JaroController(),
+				new LevelPersisterMock(), resources);
 		JaroModel model = game.getModel();
 		
 		int c = 3;
 		int r = 2;
 		Grid grid = new Grid(c, r);
+		grid.addPiece(new Piece(JaroRules.JARO_TYPE_ID, null), 0, 0);
 		model.setLevelGrid(grid);
 		JaroView view = game.getView();
 		
@@ -39,7 +48,8 @@ public class JaroViewTest extends TestCase {
 
 		assertPiece("A", 0, 0, view, false);
 		assertPiece("A", 0, 2, view, true);
-
+		
+		game.getModel().saveJaroPosition();
 	}
 	private void assertPiece(String s, int x, int y, JaroView view, boolean landscape) {
 		List<Piece> list = view.getPieces(x, y, landscape);

@@ -2,6 +2,9 @@ package com.robestone.jaro;
 
 import junit.framework.TestCase;
 
+import com.robestone.jaro.android.HtmlResources;
+import com.robestone.jaro.levels.JaroAssets;
+import com.robestone.jaro.levels.JaroResources;
 import com.robestone.jaro.piecerules.BugRules;
 import com.robestone.jaro.piecerules.JaroRules;
 import com.robestone.jaro.piecerules.TurtleRules;
@@ -18,8 +21,10 @@ public abstract class AbstractGameTest extends TestCase {
 	protected void setUp() throws Exception {
 		controller = new JaroController();
 		controller.getPieceRules().add(new LevelPasserPreventer());
-		game = new JaroGame(new JaroModel(), new JaroView(), controller,
-				new LevelManagerTest(), new LevelManagerTest());
+		JaroAssets assets = new JaroFileAssets("src-test/resources");
+		JaroResources resources = new HtmlResources(assets);
+		game = new JaroGame(new JaroModel(resources), new JaroView(), controller,
+				new LevelPersisterMock(), resources);
 		
 		bug = new Piece(BugRules.BUG_TYPE_ID, null);
 		jaro = new Piece(JaroRules.JARO_TYPE_ID, null);

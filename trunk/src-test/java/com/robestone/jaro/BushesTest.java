@@ -15,5 +15,7 @@ public class BushesTest extends AbstractGameTest {
 		// jaro standing on bush - a bird is in it
 		assertPiece(jaro, 1, 0);
 		assertStateAndType(BushRules.BUSH_TYPE_ID, BushRules.BUSH_WITH_BIRD_STATE, 1, 0);
+		
+		game.getModel().saveJaroPosition();
 	}
 }

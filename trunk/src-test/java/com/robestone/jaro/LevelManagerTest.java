@@ -1,30 +1,26 @@
 package com.robestone.jaro;
 
-import java.io.InputStream;
 import java.util.List;
 
 import junit.framework.TestCase;
 
-import com.robestone.jaro.levels.InputStreamBuilder;
+import com.robestone.jaro.android.HtmlResources;
+import com.robestone.jaro.levels.JaroResources;
 import com.robestone.jaro.levels.Level;
 import com.robestone.jaro.levels.LevelManager;
-import com.robestone.jaro.levels.LevelParser;
-import com.robestone.jaro.levels.LevelPersister;
-import com.robestone.jaro.levels.Stage;
 
-public class LevelManagerTest extends TestCase implements InputStreamBuilder, LevelPersister {
+public class LevelManagerTest extends TestCase {
 
-	private String currentLevel = "test-level-1";
-	
 	public void testFlow() {
 		
 		// loading a blank level manager, we see we go straight to stage 1, level 1
-		JaroGame game = new JaroGame(new JaroModel(), new JaroView(), new JaroController(), this, this);
+		JaroResources resources = new HtmlResources(new JaroFileAssets("src-test/resources"));
+		JaroGame game = new JaroGame(new JaroModel(resources), new JaroView(), new JaroController(), new LevelPersisterMock(), resources);
 		LevelManager levelManager = game.getModel().getLevelManager();
 		
 		Level level = levelManager.getCurrentLevel();
 		assertNotNull(level);
-		assertEquals("test-level-1", level.getLevelKey());
+		assertEquals("004.test-level-1.html", level.getLevelKey());
 		
 		// mark that level as passed
 		levelManager.passCurrentLevel();
@@ -33,7 +29,7 @@ public class LevelManagerTest extends TestCase implements InputStreamBuilder, Le
 		// advance within a stage
 		// advance between stages
 		level = levelManager.getCurrentLevel();
-		assertEquals("spider-level1", level.getLevelKey());
+		assertEquals("001.spider-level1.html", level.getLevelKey());
 		
 		// persist, destroy, bring back up again
 
@@ -45,19 +41,17 @@ public class LevelManagerTest extends TestCase implements InputStreamBuilder, Le
 	}
 	
 	public void testParseStages() {
-		LevelParser lp = new LevelParser(new JaroController().getPieceRules());
-		LevelManager lm = new LevelManager(this, lp, this);
-		List<Stage> stages = lm.getStages();
+		JaroResources resources = new HtmlResources(new JaroFileAssets("src-test/resources"));
 		
-		assertEquals("Bugs and Bushes", stages.get(0).getCaption());
-		assertEquals("bb", stages.get(0).getStageKey());
-		assertEquals("bb-1", stages.get(0).getLevels().get(0).getLevelKey());
+		assertEquals("Bugs and Bushes", resources.getStage(0).getCaption());
+		assertEquals("001.Bugs_and_Bushes", resources.getStage(0).getStageKey());
+		assertEquals("001.bb-1.html", resources.getLevel(resources.getStage(0).getStageKey(), 0).getLevelKey());
 		
-		assertEquals(3, stages.size());
-		assertEquals(2, stages.get(1).getLevels().size());
+		assertEquals(3, resources.getStagesCount());
+		assertEquals(4, resources.getLevelsCount(resources.getStage(0).getStageKey()));
 		
-		Level level = stages.get(0).getLevels().get(3);
-		Grid grid = lm.getGrid(level);
+		Level level = resources.getLevel(resources.getStage(0).getStageKey(), 3);
+		Grid grid = resources.getGrid(level);
 		Piece p = grid.getPiece(3, 1); // cave_top_left
 		assertEquals("cave", p.getType());
 		assertEquals(null, p.getState());
@@ -70,44 +64,17 @@ public class LevelManagerTest extends TestCase implements InputStreamBuilder, Le
 		assertNull(n);
 		
 		// smoke test to parse turtles
-		Level levelT = stages.get(2).getLevels().get(0);
-		Grid gridT = lm.getGrid(levelT);
+		Level levelT = resources.getLevel(resources.getStage(2).getStageKey(), 0);
+		Grid gridT = resources.getGrid(levelT);
 		assertNotNull(gridT);
 	}
 	public void testParseMultiplePiecesOnOneSquare() {
-		LevelParser lp = new LevelParser(new JaroController().getPieceRules());
-		LevelManager lm = new LevelManager(this, lp, this);
-		List<Stage> stages = lm.getStages();
-		
-		Level level = stages.get(2).getLevels().get(1);
-		Grid grid = lm.getGrid(level);
+		JaroResources resources = new HtmlResources(new JaroFileAssets("src-test/resources"));
+		Level level = resources.getLevel(resources.getStage(2).getStageKey(), 1);
+		assertEquals("002.snakoban2.html", level.getLevelKey());
+		Grid grid = resources.getGrid(level);
 		List<Piece> pieces = grid.getPieces(4, 5);
 		assertEquals(2, pieces.size());
-	}
-	@Override
-	public InputStream buildLevelInputStream(String levelKey) {
-		return ClassLoader.getSystemResourceAsStream(levelKey + ".html");
-	}
-	@Override
-	public InputStream buildStagesInputStream() {
-		return ClassLoader.getSystemResourceAsStream("jaro-test-stages.txt");
-	}
-	@Override
-	public String getCurrentLevel() {
-		return currentLevel;
-	}
-	@Override
-	public boolean isLevelUnlocked(String levelKey) {
-		return false;
-	}
-	@Override
-	public void setCurrentLevel(String levelKey) {
-		currentLevel = levelKey;
-	}
-
-	@Override
-	public void setLevelUnlocked(String levelKey) {
-		
 	}
 	
 }

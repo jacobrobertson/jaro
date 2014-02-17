@@ -2,6 +2,8 @@ package com.robestone.jaro;
 
 import junit.framework.TestCase;
 
+import com.robestone.jaro.android.HtmlResources;
+import com.robestone.jaro.levels.JaroAssets;
 import com.robestone.jaro.piecerules.BoulderRules;
 import com.robestone.jaro.piecerules.BugRules;
 import com.robestone.jaro.piecerules.JaroRules;
@@ -17,8 +19,9 @@ public class SimpleFlowTest extends TestCase {
 	protected void setUp() throws Exception {
 		controller = new JaroController();
 		controller.getPieceRules().add(new LevelPasserPreventer());
-		game = new JaroGame(new JaroModel(), new JaroView(), controller,
-				new LevelManagerTest(), new LevelManagerTest());
+		JaroAssets assets = new JaroFileAssets("src-test/resources");
+		HtmlResources resources = new HtmlResources(assets);
+		game = new JaroGame(new JaroModel(resources),  new JaroView(), controller, new LevelPersisterMock(), resources);
 		JaroModel model = game.getModel();
 		
 		Grid grid = new Grid(2, 2);
@@ -56,28 +59,36 @@ public class SimpleFlowTest extends TestCase {
 		// show we can't walk into the boulder
 		controller.move(Direction.up);
 		assertEquals(jaro, getGrid().getPiece(1, 1));
+		
+		game.getModel().saveJaroPosition();
 	}
 	public void testUndo() {
 		// eat a bug
 		assertEquals(jaro, getGrid().getPiece(0, 0));
 		assertEquals(bug, getGrid().getPiece(1, 1));
 		
+		game.getModel().saveJaroPosition();
 		controller.move(Direction.down);
 		assertEquals(jaro, getGrid().getPiece(0, 1));
 		assertEquals(bug, getGrid().getPiece(1, 1));
 		
+		game.getModel().saveJaroPosition();
 		controller.move(Direction.right);
 		assertEquals(jaro, getGrid().getPiece(1, 1));
 		assertEquals(1, getGrid().getPieces(1, 1).size());
 
 		// undo that move
+		game.getModel().saveJaroPosition();
 		controller.undoLastMove();
 		assertEquals(jaro, getGrid().getPiece(0, 1));
 		assertEquals(bug, getGrid().getPiece(1, 1));
 		
 		// eat it again - this was breaking at one point
+		game.getModel().saveJaroPosition();
 		controller.move(Direction.right);
 		assertEquals(jaro, getGrid().getPiece(1, 1));
 		assertEquals(1, getGrid().getPieces(1, 1).size());
+
+		game.getModel().saveJaroPosition();
 	}
 }
