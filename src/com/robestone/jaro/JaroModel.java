@@ -2,6 +2,7 @@ package com.robestone.jaro;
 
 import java.util.LinkedList;
 
+import com.robestone.jaro.levels.JaroResources;
 import com.robestone.jaro.levels.Level;
 import com.robestone.jaro.levels.LevelManager;
 import com.robestone.jaro.piecerules.JaroRules;
@@ -12,9 +13,14 @@ public class JaroModel {
 	
 	private LinkedList<Grid> grids;
 	private LevelManager levelManager;
+	private JaroResources jaroResources;
 	
-	private int jaroX;
-	private int jaroY;
+	private int jaroX = -1;
+	private int jaroY = -1;
+	
+	public JaroModel(JaroResources jaroResources) {
+		this.jaroResources = jaroResources;
+	}
 	
 	public Grid getGrid() {
 		return grids.getLast();
@@ -34,14 +40,23 @@ public class JaroModel {
 	}
 	public void setLevel(Level level) {
 		levelManager.setCurrentLevel(level);
-		Grid grid = levelManager.getGrid(level);
+		Grid grid = jaroResources.getGrid(level);
 		setLevelGrid(grid);	
 	}
-    public Level findLevel(int levelIndex) {
-    	return levelManager.findLevel(levelIndex);
-    }
 	public Piece getJaro() {
-		return getGrid().getPiece(jaroX, jaroY);
+		// if we are at the initial creation, we don't expect jaro there yet
+		if (jaroX < 0) {
+			return null;
+		}
+		Piece jaro = getGrid().getPieceByType(jaroX, jaroY, JaroRules.JARO_TYPE_ID);
+		if (jaro == null) {
+			/// ---- TODO REMOVE
+			/*
+			throw new IllegalStateException("Could not find Jaro @ (" + jaroX + "," + jaroY + "):" + String.valueOf(getGrid()));
+			*/
+			/// ----
+		}
+		return jaro;
 	}
 	public int getJaroColumn() {
 		return jaroX;
@@ -66,18 +81,21 @@ public class JaroModel {
 		saveJaroPosition();
 	}
 	public void saveJaroPosition() {
-		int w = getGrid().getColumns();
-		int h = getGrid().getRows();
-		for (int i = 0; i < w; i++) {
-			for (int j = 0; j < h; j++) {
-				Piece p = getGrid().getPiece(i, j);
-				if (p != null && JaroRules.JARO_TYPE_ID.equals(p.getType())) {
-					this.jaroX = i;
-					this.jaroY = j;
+		Grid grid = getGrid();
+		
+		int cols = grid.getColumns();
+		int rows = grid.getRows();
+		for (int x = 0; x < cols; x++) {
+			for (int y = 0; y < rows; y++) {
+				Piece p = grid.getPieceByType(x, y, JaroRules.JARO_TYPE_ID);
+				if (p != null) {
+					this.jaroX = x;
+					this.jaroY = y;
 					return;
 				}
 			}
 		}
+		throw new IllegalArgumentException("Could not find Jaro:" + grid.toString());
 	}
 	/**
 	 * Creates a new grid for the undo chain.

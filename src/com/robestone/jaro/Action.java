@@ -14,20 +14,26 @@ public class Action {
 	private Object newStateId;
 	private boolean removePiece;
 
-	public Action(Piece actingPiece, Object newStateId) {
+	public Action(Piece actingPiece) {
 		this.actingPiece = actingPiece;
+		if (actingPiece == null) {
+			throw new IllegalArgumentException("piece cannot be null");
+		}
+	}
+	public Action(Piece actingPiece, Object newStateId) {
+		this(actingPiece);
 		this.newStateId = newStateId;
 	}
 
 	public Action(Piece actingPiece, int fromX, int fromY, boolean removePiece) {
-		this.actingPiece = actingPiece;
+		this(actingPiece);
 		this.fromX = fromX;
 		this.fromY = fromY;
 		this.removePiece = removePiece;
 	}
 
 	public Action(Piece actingPiece, int fromX, int fromY, int toX, int toY) {
-		this.actingPiece = actingPiece;
+		this(actingPiece);
 		this.fromX = fromX;
 		this.fromY = fromY;
 		this.toX = toX;

@@ -3,14 +3,14 @@ package com.robestone.jaro;
 import java.util.List;
 
 import com.robestone.jaro.levels.Level;
-import com.robestone.jaro.piecerules.Registry;
+import com.robestone.jaro.piecerules.JaroPieceRules;
 
 public class JaroController {
 	
 	private JaroView view;
 	private JaroModel model;
 	
-	private List<PieceRules> pieceRules = Registry.getPieceRules();
+	private List<PieceRules> pieceRules = JaroPieceRules.getPieceRules();
 	private boolean isAcceptingMoves;
 
 	/**
@@ -52,7 +52,7 @@ public class JaroController {
 		
 		// before running all the actions, save the state (for undos)
 		model.cloneCurrent();
-		
+
 		// perform the user action
 		action.run(model);
 		model.saveJaroPosition(); // TODO I'm not thrilled by this way of keeping track of jaro...
@@ -116,10 +116,6 @@ public class JaroController {
 		model.setLevel(level);
 		view.levelSelected();
 	}
-	public void selectLevel(int levelIndex) {
-    	Level level = model.findLevel(levelIndex);
-    	selectLevel(level);
-    }
 
 	public void setView(JaroView view) {
 		this.view = view;

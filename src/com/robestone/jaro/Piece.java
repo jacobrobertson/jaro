@@ -2,7 +2,7 @@ package com.robestone.jaro;
 
 public class Piece {
 
-	private int id;
+	private int id = -1;
 	private String type;
 	private String subType;
 
@@ -12,6 +12,9 @@ public class Piece {
 		this(typeId, null, state);
 	}
 	public Piece(String typeId, String subTypeId, Object state) {
+		if (typeId == null) {
+			throw new IllegalArgumentException("typeId cannot be null");
+		}
 		this.type = typeId;
 		this.subType = subTypeId;
 		this.state = state;
@@ -46,6 +49,7 @@ public class Piece {
 			buf.append("/");
 			buf.append(state);
 		}
+		buf.append("/" + id);
 		return buf.toString();
 	}
 	@Override

@@ -72,7 +72,8 @@ public class Grid {
 		List<Piece> get = new ArrayList<Piece>();
 		for (List<Piece> area: pieces.values()) {
 			for (Piece p: area) {
-				if (p.getType().equals(type)) {
+				String ptype = p.getType();
+				if (ptype.equals(type)) {
 					if (state == null || p.getState().equals(state)) {
 						get.add(p);
 					}
@@ -98,12 +99,19 @@ public class Grid {
 		addPiece(piece, toX, toY);
 	}
 	public void addPiece(Piece piece, int x, int y) {
+		if (piece == null) {
+			throw new IllegalArgumentException("Piece cannot be null");
+		}
 		List<Piece> list = getPieces(x, y, true);
 		list.add(0, piece);
 	}
 	public void removePiece(Piece piece, int x, int y) {
 		List<Piece> list = getPieces(x, y);
-		list.remove(piece);
+
+		boolean removed = list.remove(piece);
+		if (!removed) {
+			throw new IllegalArgumentException("Failed to remove piece: " + piece + " from " + x + "," + y);
+		}
 	}
 	private Integer toIndex(int x, int y) {
 		return x * rows + y;
@@ -128,7 +136,22 @@ public class Grid {
 	}
 	@Override
 	public String toString() {
-		return "Grid: " + pieces.toString();
+		StringBuilder buf = new StringBuilder();
+		int cols = getColumns();
+		int rows = getRows();
+		for (int r = 0; r < rows; r++) {
+			for (int c = 0; c < cols; c++) {
+				List<Piece> p = getPieces(c, r);
+				buf.append("(" + c + "," + r + "):");
+				if (p == null) {
+					buf.append("[]");
+				} else {
+					buf.append(String.valueOf(p));
+				}
+			}
+			buf.append("\n");
+		}
+		return buf.toString();
 	}
 
 }

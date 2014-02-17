@@ -55,6 +55,11 @@ public class CaveRules extends PieceRulesAdapter {
 	private static final String cave_diag_a = "cave_diag_a";
 	private static final String cave_diag_b = "cave_diag_b";
 
+	private static final String cave_tl_br = "cave_tl_br";
+	private static final String cave_tl_bl = "cave_tl_bl";
+	private static final String cave_tl_tr = "cave_tl_tr";
+	private static final String cave_tl_tl = "cave_tl_tl";
+	
 	private SpriteMapper map;
 	
 	public CaveRules() {
@@ -121,7 +126,12 @@ public class CaveRules extends PieceRulesAdapter {
 		
 		map.addMatch(CAVE_TYPE_ID, cave_diag_a, cave_diag_a, cave_diag_b);
 		map.addMatch(CAVE_TYPE_ID, cave_diag_b, cave_diag_b, cave_diag_a);
-		
+
+		map.addMatch(CAVE_TYPE_ID, cave_tl_br, cave_tl_br, cave_tl_tr);
+		map.addMatch(CAVE_TYPE_ID, cave_tl_bl, cave_tl_bl, cave_tl_br);
+		map.addMatch(CAVE_TYPE_ID, cave_tl_tr, cave_tl_tr, cave_tl_tl);
+		map.addMatch(CAVE_TYPE_ID, cave_tl_tl, cave_tl_tl, cave_tl_bl);
+
 		return map;
 	}
 	@Override
