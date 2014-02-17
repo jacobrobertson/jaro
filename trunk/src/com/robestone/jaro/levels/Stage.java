@@ -1,11 +1,11 @@
 package com.robestone.jaro.levels;
 
-import java.util.List;
 
 public class Stage {
 	
 	/**
 	 * Useful for loading the stage data from some file.
+	 * This needs to be unique within a game type.
 	 */
 	private String stageKey;
 	
@@ -13,13 +13,10 @@ public class Stage {
 	 * Name should be shown to users.  Like "Turtle Attack"
 	 */
 	private String caption;
-	
-	private List<Level> levels;
 
-	public Stage(String stageKey, String caption, List<Level> levels) {
+	public Stage(String stageKey, String caption) {
 		this.stageKey = stageKey;
 		this.caption = caption;
-		this.levels = levels;
 	}
 
 	public String getStageKey() {
@@ -28,10 +25,6 @@ public class Stage {
 
 	public String getCaption() {
 		return caption;
-	}
-
-	public List<Level> getLevels() {
-		return levels;
 	}
 
 }

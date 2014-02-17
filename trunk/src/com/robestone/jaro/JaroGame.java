@@ -1,9 +1,8 @@
 package com.robestone.jaro;
 
-import com.robestone.jaro.levels.InputStreamBuilder;
+import com.robestone.jaro.levels.JaroResources;
 import com.robestone.jaro.levels.Level;
 import com.robestone.jaro.levels.LevelManager;
-import com.robestone.jaro.levels.LevelParser;
 import com.robestone.jaro.levels.LevelPersister;
 
 public class JaroGame {
@@ -12,8 +11,7 @@ public class JaroGame {
 	private JaroModel model;
 	private JaroController controller;
 	
-	public JaroGame(JaroModel model, JaroView view, JaroController controller, 
-			InputStreamBuilder inputStreamBuilder, LevelPersister levelPersister) {
+	public JaroGame(JaroModel model, JaroView view, JaroController controller, LevelPersister levelPersister, JaroResources jaroResources) {
 		this.model = model;
 		this.view = view;
 		this.controller = controller;
@@ -22,8 +20,7 @@ public class JaroGame {
 		controller.setView(view);
 		controller.setModel(model);
 		
-		LevelParser parser = new LevelParser(controller.getPieceRules());
-		LevelManager levelManager = new LevelManager(inputStreamBuilder, parser, levelPersister);
+		LevelManager levelManager = new LevelManager(levelPersister, jaroResources);
 		model.setLevelManager(levelManager);
 		
 		Level currentLevel = levelManager.getCurrentLevel();
