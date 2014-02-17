@@ -12,6 +12,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.robestone.jaro.levels.JaroAssets;
+import com.robestone.jaro.levels.JaroResources;
 import com.robestone.jaro.levels.Level;
 import com.robestone.jaro.levels.Stage;
 
@@ -49,7 +51,9 @@ public class JaroActivity extends Activity {
 		}
 	}
 	private void createGame() {
-		JaroResources resources = new JaroResources(this);
+		// TODO need to determine game type from what was clicked
+		JaroAssets assets = new JaroAndroidAssets(getAssets());
+		HtmlResources resources = new HtmlResources(assets);
 		game = new JaroAndroidGame(this, resources);
 	}
 	void showAbout() {
@@ -90,6 +94,7 @@ public class JaroActivity extends Activity {
 	@Override
 	public void onBackPressed() {
 		// TODO if on main menu, then quit
+		//		should also handle game types
 
 		// else, send the undo message
 		game.getController().undoLastMove();
@@ -144,33 +149,43 @@ public class JaroActivity extends Activity {
     }
     private boolean showChooseStageMenu() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-    	
-    	final List<Stage> stages = game.getModel().getLevelManager().getStages();
+		final JaroResources resources = game.getJaroResources();
     	List<String> stageCaptions = new ArrayList<String>();
-    	for (Stage stage: stages) {
-    		boolean unlocked = showAllLevels || stage.getLevels().get(0).isUnlocked();
+    	Stage stage1 = null;
+    	for (Stage stage: game.getJaroResources().getStages()) {
+    		if (stage1 == null) {
+    			stage1 = stage;
+    		}
+    		String stageKey = stage.getStageKey();
+    		boolean unlocked = showAllLevels;
+    		if (!unlocked) {
+        		Level level = resources.getLevel(stageKey, 0);
+    			unlocked = game.getModel().getLevelManager().isLevelUnlocked(level);
+    		}
     		// TODO I want to make a better algorithm than this.  for example, if you pass
     		//		a certain percent of a stage, it unlocks the next stage
+    		//		also, it should show the stages greyed out rather than just not showing up
     		if (!unlocked) {
     			break;
     		}
        		stageCaptions.add(stage.getCaption());
     	}
     	if (stageCaptions.size() == 1) {
-    		return showChooseLevelMenu(stages.get(0));
+    		return showChooseLevelMenu(stage1);
     	} else {
     		// TODO push this logic into the level manager
     		// TODO all strings should go to resources
     		String title = "Pick a Stage";
-    		if (stageCaptions.size() < stages.size()) {
-    			title = title + " (" + stageCaptions.size() + "/" + stages.size() + " unlocked)";
+    		int stagesCount = resources.getStagesCount();
+    		if (stageCaptions.size() < stagesCount) {
+    			title = title + " (" + stageCaptions.size() + "/" + stagesCount + " unlocked)";
     		}
         	builder.setTitle(title);
 	    	String[] items = new String[stageCaptions.size()];
 	    	items = stageCaptions.toArray(items);
 	    	builder.setItems(items, new DialogInterface.OnClickListener() {
 	    	    public void onClick(DialogInterface dialog, int item) {
-	    	    	Stage stage = stages.get(item);
+	    	    	Stage stage = resources.getStage(item);
 	    	    	showChooseLevelMenu(stage);
 	    	    }
 	    	});
@@ -183,17 +198,23 @@ public class JaroActivity extends Activity {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
     	
 		// TODO push as much logic to level manager as possible
+		final JaroResources resources = game.getJaroResources();
     	List<String> levelCaptions = new ArrayList<String>();
-    	int size = stage.getLevels().size();
+    	int size = resources.getLevelsCount(stage.getStageKey());
 		for (int i = 0; i < size; i++) {
-    		boolean unlocked = showAllLevels || stage.getLevels().get(i).isUnlocked();
+    		boolean unlocked = showAllLevels;
+    		Level level = null;
+    		if (!unlocked) {
+    			level = resources.getLevel(stage.getStageKey(), i); 
+    			unlocked = game.getModel().getLevelManager().isLevelUnlocked(level);
+    		}
     		if (!unlocked) {
     			break;
     		}
-    		levelCaptions.add(stage.getCaption() + " #" + (i + 1));
+    		levelCaptions.add((i + 1) + ". " + level.getCaption());
 		}
 
-		String title = "Pick a Level";
+		String title = stage.getCaption();
 		if (levelCaptions.size() < size) {
 			title = title + " (" + levelCaptions.size() + "/" + size + " unlocked)";
 		}
@@ -203,7 +224,7 @@ public class JaroActivity extends Activity {
     	items = levelCaptions.toArray(items);
     	builder.setItems(items, new DialogInterface.OnClickListener() {
     	    public void onClick(DialogInterface dialog, int item) {
-    	    	Level level = stage.getLevels().get(item);
+    	    	Level level = resources.getLevel(stage.getStageKey(), item);
     	    	game.getController().selectLevel(level);
     	    }
     	});

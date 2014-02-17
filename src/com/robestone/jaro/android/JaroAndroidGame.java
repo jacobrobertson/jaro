@@ -6,15 +6,15 @@ import com.robestone.jaro.JaroModel;
 
 public class JaroAndroidGame extends JaroGame {
 
-	private JaroResources jaroResources;
+	private JaroAndroidResources jaroResources;
 	private boolean active;
 	
-	public JaroAndroidGame(JaroActivity activity, JaroResources resources) {
-		super(new JaroModel(), new JaroAndroidView(activity),
-				new JaroController(), resources, new JaroPreferences(activity));
+	public JaroAndroidGame(JaroActivity activity, JaroAndroidResources resources) {
+		super(new JaroModel(resources), new JaroAndroidView(activity),
+				new JaroController(), new JaroPreferences(activity), resources);
 		this.jaroResources = resources;
 	}
-	public JaroResources getJaroResources() {
+	public JaroAndroidResources getJaroResources() {
 		return jaroResources;
 	}
 	public JaroAndroidView getView() {

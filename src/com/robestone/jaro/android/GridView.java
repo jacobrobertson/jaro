@@ -14,6 +14,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -31,7 +32,7 @@ import com.robestone.jaro.Piece;
  */
 public class GridView extends SurfaceView implements SurfaceHolder.Callback {
 
-	private JaroResources resources;
+	private JaroAndroidResources resources;
 	private JaroActivity activity;
 	private SpriteAnimationThread spriteAnimationThread;
 	private JaroAndroidView jaroView;
@@ -161,34 +162,40 @@ public class GridView extends SurfaceView implements SurfaceHolder.Callback {
 			Drawable d = activity.getResources().getDrawable(id);
 			if (d instanceof AnimationDrawable) {
 				AnimationDrawable a = (AnimationDrawable) d;
-				CellInfo info = pieceAnimations.get(piece.getId());
-				if (info == null) {
-					info = new CellInfo();
-					pieceAnimations.put(piece.getId(), info);
-				}
-				// see if it's time to change to next frame or not
-				boolean next = false;
-				if (info.frameDrawTime == -1) {
-					next = true;
-				} else {
-					long requiredDuration = a.getDuration(info.currentFrame);
-					long actualDuration = System.currentTimeMillis() - info.frameDrawTime;
-					if (actualDuration >= requiredDuration) {
+				boolean test = !true;
+				if (!test) {
+					CellInfo info = pieceAnimations.get(piece.getId());
+					if (info == null) {
+						info = new CellInfo();
+						pieceAnimations.put(piece.getId(), info);
+					}
+					// see if it's time to change to next frame or not
+					boolean next = false;
+					if (info.frameDrawTime == -1) {
 						next = true;
+					} else {
+						long requiredDuration = a.getDuration(info.currentFrame);
+						long actualDuration = System.currentTimeMillis() - info.frameDrawTime;
+						if (actualDuration >= requiredDuration) {
+							next = true;
+						}
 					}
-				}
-				if (next) {
-					info.currentFrame++;
-					if (info.currentFrame == a.getNumberOfFrames()) {
-						info.currentFrame = 0;
+					if (next) {
+						info.currentFrame++;
+						if (info.currentFrame == a.getNumberOfFrames()) {
+							info.currentFrame = 0;
+						}
+						info.frameDrawTime = System.currentTimeMillis();
 					}
-					info.frameDrawTime = System.currentTimeMillis();
+					d = a.getFrame(info.currentFrame);
+					if (d == null) {
+						throw new IllegalStateException("Animation thread working against wrong map for sprite " + 
+								spriteKey + "/" + piece + " for AnimationDrawable " + a + ", frame=" + info.currentFrame);
+					}
+				} else {
+					d = a.getFrame(0);
 				}
-				d = a.getFrame(info.currentFrame);
-				if (d == null) {
-					throw new IllegalStateException("Animation thread working against wrong map");
-				}
-			} 
+			}
 			if (d == null) {
 				throw new IllegalArgumentException("No sprite " + spriteKey + "/" + piece);
 			}
