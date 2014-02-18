@@ -14,7 +14,6 @@ import android.graphics.Rect;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -64,7 +63,8 @@ public class GridView extends SurfaceView implements SurfaceHolder.Callback {
 	}
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
-		spriteAnimationThread = new SpriteAnimationThread(getHolder(), this);
+		SurfaceHolder lholder = holder; // getHolder();
+		spriteAnimationThread = new SpriteAnimationThread(lholder, this);
 		spriteAnimationThread.setRunning(true);
         spriteAnimationThread.start();
 	}

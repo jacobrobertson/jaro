@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import android.util.Log;
-
 import com.robestone.jaro.Grid;
 import com.robestone.jaro.Piece;
 import com.robestone.jaro.levels.JaroAssets;
@@ -34,7 +32,6 @@ public class HtmlResources extends JaroAndroidResources {
 
 	@Override
 	public Iterable<Stage> getStages() {
-		Log.i("HtmlResources", "getStages");
 		return new StagesIterable(getSortedStageNames());
 	}
 
@@ -44,7 +41,6 @@ public class HtmlResources extends JaroAndroidResources {
 		return parseStage(fileName);
 	}
 	private String[] getSortedStageNames() {
-		Log.i("HtmlResources", "getSortedStageNames");
 		return getSortedFileNames(JARO_ASSETS_DIR);
 	}
 	private String[] getSortedFileNames(String path) {
@@ -53,7 +49,6 @@ public class HtmlResources extends JaroAndroidResources {
 	}
 	@Override
 	public int getStagesCount() {
-		Log.i("HtmlResources", "getStagesCount");
 		return assets.list(JARO_ASSETS_DIR).length;
 	}
 	private static Stage parseStage(String fileName) {
@@ -71,18 +66,15 @@ public class HtmlResources extends JaroAndroidResources {
 
 	@Override
 	public Iterable<Level> getLevels(String stageKey) {
-		Log.i("HtmlResources", "getLevels:Iterable<Level>");
 		return new LevelsIterable(stageKey, getSortedLevelNames(stageKey));
 	}
 
 	@Override
 	public int getLevelsCount(String stageKey) {
-		Log.i("HtmlResources", "getLevelsCount");
 		return assets.list(JARO_ASSETS_DIR + "/" + stageKey).length;
 	}
 	
 	private String[] getSortedLevelNames(String stageKey) {
-		Log.i("HtmlResources", "getSortedLevelNames");
 		return getSortedFileNames(JARO_ASSETS_DIR + "/" + stageKey);
 	}
 
@@ -110,7 +102,6 @@ public class HtmlResources extends JaroAndroidResources {
 	}
 
 	public Grid parseGrid(String data, Level level) {
-		Log.i("HtmlResources", "getGrid");
 		String html = cleanHtml(data);
 		return parseGrid(html);
 	}

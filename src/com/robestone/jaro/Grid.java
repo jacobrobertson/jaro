@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import android.util.Log;
+
 public class Grid {
 
 	/**
@@ -136,6 +138,7 @@ public class Grid {
 	}
 	@Override
 	public String toString() {
+		Log.i("Grid", "toString");
 		StringBuilder buf = new StringBuilder();
 		int cols = getColumns();
 		int rows = getRows();

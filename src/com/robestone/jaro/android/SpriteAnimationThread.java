@@ -25,9 +25,11 @@ public class SpriteAnimationThread extends Thread {
 		while (run) {
 			canvas = null;
 			try {
-				canvas = surfaceHolder.lockCanvas(null);
-				synchronized (surfaceHolder) {
-					gridView.onDraw(canvas);
+				canvas = surfaceHolder.lockCanvas();
+				if (canvas != null) {
+					synchronized (surfaceHolder) {
+						gridView.onDraw(canvas);
+					}
 				}
 				try {
 					sleep(sleep);
