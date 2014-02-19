@@ -53,7 +53,9 @@ public class JaroActivity extends Activity {
 	private void createGame() {
 		// TODO need to determine game type from what was clicked
 		JaroAssets assets = new JaroAndroidAssets(getAssets());
-		HtmlResources resources = new HtmlResources(assets);
+		JaroAndroidResources resources = 
+				//new HtmlResources(assets);
+				new DbResources(assets);
 		game = new JaroAndroidGame(this, resources);
 	}
 	void showAbout() {
@@ -242,8 +244,10 @@ public class JaroActivity extends Activity {
 	public void showLevelAdvanceMenu() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
     	builder.setTitle(R.string.level_passed);
+    	// TODO will this work?
+    	String caption = game.getModel().getLevelManager().getCurrentLevel().getCaption();
     	String[] items = {
-    			"Continue", // TODO how to make in bundle? 
+    			"Next up... " + caption, // TODO how to make in bundle? 
     			};
     	builder.setItems(items, new DialogInterface.OnClickListener() {
     	    public void onClick(DialogInterface dialog, int item) {

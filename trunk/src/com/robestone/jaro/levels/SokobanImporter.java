@@ -330,5 +330,33 @@ public class SokobanImporter {
 		return tokens;
 	}
 
+	/*
+<div>Most popular levels in this collection</div>
+						 <a href="index.php?mode=level&amp;lid=12405"><img id="popular_item_1" width="120" src="./pics/thumb_12405.gif"title="&laquo;level  05&raquo;
+ completed 69 times"></a><a href="index.php?mode=level&amp;lid=12402"><img id="popular_item_2" width="120" src="./pics/thumb_12402.gif"title="&laquo;level  02&raquo;
+ completed 59 times"></a><a href="index.php?mode=level&amp;lid=12403"><img id="popular_item_3" width="120" src="./pics/thumb_12403.gif"title="&laquo;level  03&raquo;
+ completed 59 times"></a><a href="index.php?mode=level&amp;lid=12408"><img id="popular_item_4" width="120" src="./pics/thumb_12408.gif"title="&laquo;level  08&raquo;
+ completed 58 times"></a><a href="index.php?mode=level&amp;lid=12401"><img id="popular_item_5" width="120" src="./pics/thumb_12401.gif"title="&laquo;level  01&raquo;
+ completed 51 times"></a><a href="index.php?mode=level&amp;lid=12407"><img id="popular_item_6" width="120" src="./pics/thumb_12407.gif"title="&laquo;level  07&raquo;
+ completed 51 times"></a>
+</div>
+
+ 	*/
+	public void popularityParser() throws Exception {
+		Pattern pattern = Pattern.compile("popular_item_.\" width=\"[0-9]+\" src=\"./pics/thumb_([0-9]+).gif");
+		// there are holes in the catalog
+		for (int i = 0; i < 142; i++) {
+			// download the catalog - it might be blank
+			String url = "http://www.game-sokoban.com/index.php?mode=catalog&cid=" + i;
+			URLConnection con = new URL(url).openConnection();
+			InputStream in = con.getInputStream();
+			String page = Utils.toString(in);
+			Matcher m = pattern.matcher(page);
+			while (m.find()) {
+				String id = m.group(1);
+				System.out.println(id);
+			}
+		}
+	}
 	
 }

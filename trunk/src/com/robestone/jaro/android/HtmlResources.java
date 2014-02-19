@@ -2,7 +2,6 @@ package com.robestone.jaro.android;
 
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,25 +30,18 @@ public class HtmlResources extends JaroAndroidResources {
 	}
 
 	@Override
-	public Iterable<Stage> getStages() {
-		return new StagesIterable(getSortedStageNames());
-	}
-
-	@Override
-	public Stage getStage(int index) {
-		String fileName = getSortedStageNames()[index];
-		return parseStage(fileName);
-	}
-	private String[] getSortedStageNames() {
-		return getSortedFileNames(JARO_ASSETS_DIR);
+	List<Stage> doGetStages() {
+		String[] names = getSortedFileNames(JARO_ASSETS_DIR);
+		List<Stage> stages = new ArrayList<Stage>();
+		for (String name: names) {
+			Stage s = parseStage(name);
+			stages.add(s);
+		}
+		return stages;
 	}
 	private String[] getSortedFileNames(String path) {
 		String[] fileNames = assets.list(path);
 		return fileNames;
-	}
-	@Override
-	public int getStagesCount() {
-		return assets.list(JARO_ASSETS_DIR).length;
 	}
 	private static Stage parseStage(String fileName) {
 		String caption = cleanName(fileName);
@@ -57,31 +49,15 @@ public class HtmlResources extends JaroAndroidResources {
 		return stage;
 	}
 
-	private static String cleanName(String fileName) {
-		int pos = fileName.indexOf('.');
-		String caption = fileName.substring(pos + 1);
-		caption = caption.replace('_', ' ');
-		return caption;
-	}
-
 	@Override
-	public Iterable<Level> getLevels(String stageKey) {
-		return new LevelsIterable(stageKey, getSortedLevelNames(stageKey));
-	}
-
-	@Override
-	public int getLevelsCount(String stageKey) {
-		return assets.list(JARO_ASSETS_DIR + "/" + stageKey).length;
-	}
-	
-	private String[] getSortedLevelNames(String stageKey) {
-		return getSortedFileNames(JARO_ASSETS_DIR + "/" + stageKey);
-	}
-
-	@Override
-	public Level getLevel(String stageKey, int index) {
-		String levelKey = getSortedLevelNames(stageKey)[index];
-		return parseLevel(stageKey, levelKey);
+	List<Level> doGetLevels(String stageKey) {
+		String[] names = getSortedFileNames(JARO_ASSETS_DIR + "/" + stageKey);
+		List<Level> levels = new ArrayList<Level>();
+		for (String name: names) {
+			Level l = parseLevel(stageKey, name);
+			levels.add(l);
+		}
+		return levels;
 	}
 	
 	private static Level parseLevel(String stageKey, String levelKey) {
@@ -153,13 +129,6 @@ public class HtmlResources extends JaroAndroidResources {
 		
 		return grid;
 	}
-	private String cleanKey(String k) {
-		char c = k.charAt(k.length() - 1);
-		if (Character.isDigit(c)) {
-			k = k.substring(0, k.length() - 1);
-		}
-		return k;
-	}
 	private int getCols(String htmlData) {
 		int cols = 0;
 		int pos = htmlData.indexOf("<tr>");
@@ -170,66 +139,6 @@ public class HtmlResources extends JaroAndroidResources {
 			cols++;
 		}
 		return cols - 1;
-	}
-	
-	public static class StagesIterable implements Iterable<Stage>, Iterator<Stage> {
-		private String[] fileNames;
-		private int next = 0;
-		
-		public StagesIterable(String[] fileNames) {
-			this.fileNames = fileNames;
-		}
-
-		@Override
-		public Iterator<Stage> iterator() {
-			return this;
-		}
-		
-		@Override
-		public boolean hasNext() {
-			return next < fileNames.length;
-		}
-		
-		@Override
-		public Stage next() {
-			return parseStage(fileNames[next++]);
-		}
-		
-		@Override
-		public void remove() {
-			// no-op
-		}
-	}
-	
-	public static class LevelsIterable implements Iterable<Level>, Iterator<Level> {
-		private String stageKey;
-		private String[] fileNames;
-		private int next = 0;
-		
-		public LevelsIterable(String stageKey, String[] fileNames) {
-			this.stageKey = stageKey;
-			this.fileNames = fileNames;
-		}
-
-		@Override
-		public Iterator<Level> iterator() {
-			return this;
-		}
-		
-		@Override
-		public boolean hasNext() {
-			return next < fileNames.length;
-		}
-		
-		@Override
-		public Level next() {
-			return parseLevel(stageKey, fileNames[next++]);
-		}
-		
-		@Override
-		public void remove() {
-			// no-op
-		}
 	}
 	
 }

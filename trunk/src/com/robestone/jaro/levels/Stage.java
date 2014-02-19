@@ -13,6 +13,12 @@ public class Stage {
 	 * Name should be shown to users.  Like "Turtle Attack"
 	 */
 	private String caption;
+	
+	/**
+	 *  only needed by db
+	 *  Indicates the position of the stage in the database, based on the number of levels.
+	 */
+	private int stageIndex;
 
 	public Stage(String stageKey, String caption) {
 		this.stageKey = stageKey;
@@ -27,4 +33,12 @@ public class Stage {
 		return caption;
 	}
 
+	public int getStageIndex() {
+		return stageIndex;
+	}
+
+	public void setStageIndex(int stageIndex) {
+		this.stageIndex = stageIndex;
+	}
+	
 }

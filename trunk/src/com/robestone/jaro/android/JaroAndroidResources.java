@@ -2,9 +2,12 @@ package com.robestone.jaro.android;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.robestone.jaro.levels.JaroResources;
+import com.robestone.jaro.levels.Level;
+import com.robestone.jaro.levels.Stage;
 
 /**
  * Central class for performing all I/O of levels and stages.
@@ -19,6 +22,55 @@ public abstract class JaroAndroidResources implements JaroResources {
 	
 	private Map<String, Integer> ids = new HashMap<String, Integer>();
 	
+	private List<Stage> stages;
+	private List<Level> currentLevels;
+	private String currentStage;
+
+	@Override
+	public final Iterable<Stage> getStages() {
+		return getStagesList();
+	}
+	private List<Stage> getStagesList() {
+		if (stages == null) {
+			stages = doGetStages();
+		}
+		return stages;
+	}
+	abstract List<Stage> doGetStages();
+
+	@Override
+	public final int getStagesCount() {
+		return getStagesList().size();
+	}
+
+	@Override
+	public final Stage getStage(int index) {
+		return getStagesList().get(index);
+	}
+
+	@Override
+	public final Iterable<Level> getLevels(String stageKey) {
+		return getLevelsList(stageKey);
+	}
+	private List<Level> getLevelsList(String stageKey) {
+		if (!stageKey.equals(currentStage)) {
+			currentLevels = doGetLevels(stageKey);
+			currentStage = stageKey;
+		}
+		return currentLevels;
+	}
+	abstract List<Level> doGetLevels(String stageKey);
+
+	@Override
+	public final int getLevelsCount(String stageKey) {
+		return getLevelsList(stageKey).size();
+	}
+
+	@Override
+	public final Level getLevel(String stageKey, int index) {
+		return getLevelsList(stageKey).get(index);
+	}
+
 	public Integer getSpriteId(String spriteKey) {
 		Integer id = ids.get(spriteKey);
 		if (id != null) {
@@ -38,5 +90,20 @@ public abstract class JaroAndroidResources implements JaroResources {
 		}
 		throw new RuntimeException("Could not find sprite key " + spriteKey);
 	}
+
+	static String cleanKey(String k) {
+		char c = k.charAt(k.length() - 1);
+		if (Character.isDigit(c)) {
+			k = k.substring(0, k.length() - 1);
+		}
+		return k;
+	}
+	static String cleanName(String fileName) {
+		int pos = fileName.indexOf('.');
+		String caption = fileName.substring(pos + 1);
+		caption = caption.replace('_', ' ');
+		return caption;
+	}
+
 
 }
