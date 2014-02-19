@@ -18,6 +18,7 @@ public class Level {
 	// these are only used in sokoban - but might be used later in the compressed format
 	private int cols;
 	private int rows;
+	private int levelIndex;
 
 	public Level(String levelKey, String levelCaption, String stageKey, String levelDataFormatType) {
 		this.levelKey = levelKey;
@@ -54,5 +55,22 @@ public class Level {
 	public String getLevelDataFormatType() {
 		return levelDataFormatType;
 	}
-	
+	public void setCols(int cols) {
+		this.cols = cols;
+	}
+	public void setRows(int rows) {
+		this.rows = rows;
+	}
+	public int getCols() {
+		return cols;
+	}
+	public int getRows() {
+		return rows;
+	}
+	public int getLevelIndex() {
+		return levelIndex;
+	}
+	public void setLevelIndex(int levelIndex) {
+		this.levelIndex = levelIndex;
+	}
 }

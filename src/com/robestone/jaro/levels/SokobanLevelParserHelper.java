@@ -17,29 +17,21 @@ import com.robestone.jaro.piecerules.JaroPieceRules;
 
 public class SokobanLevelParserHelper {
 
-	public static final String GAME_TYPE = "Jaroban";
-	public static final String DATA_TYPE = "compressed-simple";
-	
-	public static void main(String[] args) throws Exception {
-//		new SokobanParser(null).printFileNameMapping();
-//		new SokobanLevelParserHelper(null).compressFiles();
-	}
-	
 	private Map<String, String> fileNameMap = new HashMap<String, String>();
+	private boolean isDataSplitByNewline;
 	
-	public SokobanLevelParserHelper() {
+	public SokobanLevelParserHelper(boolean isDataSplitByNewline) {
 		addFileNameMappings();
+		this.isDataSplitByNewline = isDataSplitByNewline;
 	}
 	
-	public Grid parseGrid(InputStream in) {
-		String data = null;
-		return parseGrid(data);
-	}
 	public Grid parseGrid(String data, Level level) {
-		return parseGrid(data);
-	}
-	public Grid parseGrid(String data) {
-		List<List<String>> tokens = toTokens(data);
+		List<List<String>> tokens;
+		if (isDataSplitByNewline) {
+			tokens = toTokensForSplitData(data);
+		} else {
+			tokens = toTokensForSingleLineData(level, data);
+		}
 		int rows = tokens.size();
 		int cols = tokens.get(0).size();
 		Grid grid = new Grid(cols, rows);
@@ -74,7 +66,7 @@ public class SokobanLevelParserHelper {
 				}
 			}
 		}
-		
+		grid.initIds();
 		return grid;
 	}
 	private void buildTurtle(String key, Grid grid, int x, int y) {
@@ -130,7 +122,7 @@ public class SokobanLevelParserHelper {
 		String key = buf.toString();
 		String actualKey = fileNameMap.get(key);
 
-		System.out.println("[" + x + "," + y + "] " + key + " => " + actualKey + " > " + tokens.get(y));
+//		System.out.println("[" + x + "," + y + "] " + key + " => " + actualKey + " > " + tokens.get(y));
 
 		if (actualKey == null) {
 			throw new IllegalArgumentException(key);
@@ -156,7 +148,39 @@ public class SokobanLevelParserHelper {
 			return "o";
 		}
 	}
-	public List<List<String>> toTokens(String data) {
+	public List<List<String>> toTokensForSingleLineData(Level level, String data) {
+		List<String> allTokens = toTokensRow(level, data);
+		List<List<String>> tokens = new ArrayList<List<String>>();
+		int cols = level.getCols();
+		int rows = level.getRows();
+		int pos = 0;
+		for (int r = 0; r < rows; r++) {
+			List<String> row = new ArrayList<String>();
+			for (int c = 0; c < cols; c++) {
+				row.add(allTokens.get(pos++));
+			}
+			tokens.add(row);
+		}
+		return tokens;
+	}
+	private String getTurtle(String seedKey, String token, int count) {
+		int pos = count % seedKey.length();
+		int c = seedKey.charAt(pos);
+		c = (c % 4);
+		String turtles = "^v<>";
+		String onBoxes = "AV{}";
+		String ttype;
+		if (token.equals("t")) {
+			ttype = turtles;
+		} else if (token.equals("T")) {
+			ttype = onBoxes;
+		} else {
+			throw new IllegalArgumentException();
+		}
+		return ttype.substring(c, c + 1);
+	}
+	
+	public List<List<String>> toTokensForSplitData(String data) {
 		data = data.trim();
 		List<List<String>> tokens = new ArrayList<List<String>>();
 		
@@ -164,7 +188,7 @@ public class SokobanLevelParserHelper {
 		String[] rows = data.split("\n");
 		for (String row: rows) {
 			row = row.trim();
-			List<String> rowTokens = toTokensRow(row);
+			List<String> rowTokens = toTokensRow(null, row);
 			int testCols = rowTokens.size();
 			if (cols < 0) {
 				cols = testCols;
@@ -178,10 +202,16 @@ public class SokobanLevelParserHelper {
 		
 		return tokens;
 	}
-	public List<String> toTokensRow(String row) {
+	public List<String> toTokensRow(Level level, String row) {
 		List<String> tokens = new ArrayList<String>();
+		String seedKey = null;
+		if (level != null) {
+			seedKey = level.getStageKey() + ":" + level.getLevelKey();
+		}
 		
 		// 3_wf>f2aw3af2w4_
+		// also - we will consider T and t - have to account for a predictable ordering of turtles position
+		int turtleCount = 0;
 		int count = 0;
 		for (int i = 0; i < row.length(); i++) {
 			char c = row.charAt(i);
@@ -193,7 +223,12 @@ public class SokobanLevelParserHelper {
 				}
 				String token = String.valueOf(c);
 				for (int j = 0; j < count; j++) {
-					tokens.add(token);
+					String t = token;
+					if (token.equalsIgnoreCase("t")) {
+						t = getTurtle(seedKey, t, turtleCount);
+						turtleCount++;
+					}
+					tokens.add(t);
 				}
 				count = 0;
 			}
@@ -394,7 +429,7 @@ public class SokobanLevelParserHelper {
 		FileInputStream in = new FileInputStream(file);
 		String data = Utils.toString(in);
 
-		List<List<String>> tokens = toTokens(data);
+		List<List<String>> tokens = toTokensForSplitData(data);
 		index.cols = tokens.get(0).size();
 		index.rows = tokens.size();
 				
@@ -417,7 +452,7 @@ public class SokobanLevelParserHelper {
 		return index;
 	}
 	private String compressDuplicateCells(String data) {
-		List<List<String>> tokens = toTokens(data);
+		List<List<String>> tokens = toTokensForSplitData(data);
 		
 		List<String> toCompress = new ArrayList<String>();
 		for (List<String> row: tokens) {
