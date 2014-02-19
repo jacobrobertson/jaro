@@ -1,19 +1,18 @@
 package com.robestone.jaro;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.List;
 
 import junit.framework.TestCase;
 
+import com.robestone.jaro.levels.Level;
 import com.robestone.jaro.levels.SokobanLevelParserHelper;
 import com.robestone.jaro.piecerules.JaroPieceRules;
 
 public class SokobanParserTest extends TestCase {
 
 	private List<PieceRules> rulesList = JaroPieceRules.getPieceRules();
-	private SokobanLevelParserHelper parser = new SokobanLevelParserHelper();
 	
 	public void testToTokens() {
 		doTestToTokens(
@@ -26,7 +25,8 @@ public class SokobanParserTest extends TestCase {
 				"[j, j, j, j, j, j, j, j, j, j, j, j, j, j, j, j, j, j, j, j, j, j, j]]");
 	}
 	public void doTestToTokens(String file, String expect) {
-		List<List<String>> tokens = parser.toTokens(file);
+		SokobanLevelParserHelper parser = new SokobanLevelParserHelper(true);
+		List<List<String>> tokens = parser.toTokensForSplitData(file);
 		String got = tokens.toString();
 		assertEquals(expect, got);
 	}
@@ -138,7 +138,8 @@ public class SokobanParserTest extends TestCase {
 	}
 	
 	public void doSmokeTestParseGrid(String data, int expectCols, int expectRows) {
-		Grid g = parser.parseGrid(data);
+		SokobanLevelParserHelper parser = new SokobanLevelParserHelper(true);
+		Grid g = parser.parseGrid(data, null);
 		int c = g.getColumns();
 		int r = g.getRows();
 		assertEquals(expectRows, r);
@@ -159,6 +160,16 @@ public class SokobanParserTest extends TestCase {
 			}
 		}
 		outputGrid(g);
+	}
+	public void testParseSingleLineData() {
+		String data = "2_10w3_w8fw3_wf2wf2w2fw_3w8fw_w3ftwawtwfw_wftwfaJa3f3w3ftwawt3f2w4faTafwtf2w2fwtwawt3f3w8f3w_w2f2wf2wfw3_w8fw3_10w2_";
+		SokobanLevelParserHelper parser = new SokobanLevelParserHelper(false);
+		Level level = new Level("foo", "bar", "sk", "html");
+		level.setCols(14);
+		level.setRows(12);
+		Grid grid = parser.parseGrid(data, level);
+		System.out.println(grid);
+		assertNotNull(grid);
 	}
 	public static void outputGrid(Grid g) {
 		int width = 40;
