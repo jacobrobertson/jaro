@@ -18,4 +18,8 @@
     This means it may have some bugs and limitations, and there aren\'t all that many levels. 
     
     However, it should be improving quite a bit in the near future.</string>
+    <string name="pick_a_stage">Pick a Stage</string>
+    <string name="choose_game">Choose Game</string>
+    <string name="unlocked">unlocked</string>
+    <string name="next_up">Next Up ...</string>
 </resources>

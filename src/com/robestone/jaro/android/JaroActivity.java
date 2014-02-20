@@ -42,7 +42,7 @@ public class JaroActivity extends Activity {
 		} else {
 			// need to check preferences
 			// TODO might not be good to acquire like this?
-			final JaroPreferences prefs = new JaroPreferences(this);
+			JaroPreferences prefs = new JaroPreferences(this);
 			if (prefs.isEulaRead()) {
 				showHome();
 			} else {
@@ -51,11 +51,15 @@ public class JaroActivity extends Activity {
 		}
 	}
 	private void createGame() {
-		// TODO need to determine game type from what was clicked
 		JaroAssets assets = new JaroAndroidAssets(getAssets());
-		JaroAndroidResources resources = 
-				//new HtmlResources(assets);
-				new DbResources(assets);
+		JaroPreferences prefs = new JaroPreferences(this);
+		JaroAndroidResources resources;
+		String gameType = prefs.getGameType();
+		if (HtmlResources.JARO_GAME_TYPE.equals(gameType)) {
+			resources = new HtmlResources(assets);
+		} else {
+			resources = new DbResources(assets);
+		}
 		game = new JaroAndroidGame(this, resources);
 	}
 	void showAbout() {
@@ -142,12 +146,31 @@ public class JaroActivity extends Activity {
 	        	startGame();
 	        case R.id.choose_different_level:
 	        	return showChooseStageMenu();
+	        case R.id.choose_game_type:
+	        	return showChooseGameMenu();
 	        case R.id.zoom:
 	        	game.getView().zoomIn();
 	        	return true;
 	        default:
 	            return false;
         }
+    }
+    private boolean showChooseGameMenu() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		String title = getString(R.string.choose_game);
+    	builder.setTitle(title);
+		final String[] gameTypes = {HtmlResources.JARO_GAME_TYPE, DbResources.JAROBAN_GAME_TYPE};
+    	builder.setItems(gameTypes, new DialogInterface.OnClickListener() {
+    	    public void onClick(DialogInterface dialog, int item) {
+    	    	JaroPreferences prefs = new JaroPreferences(JaroActivity.this);
+    	    	prefs.setGameType(gameTypes[item]);
+    	    	createGame();
+    	    	startGame();
+    	    }
+    	});
+    	AlertDialog dialog = builder.create();
+    	dialog.show();
+    	return true;
     }
     private boolean showChooseStageMenu() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -177,10 +200,10 @@ public class JaroActivity extends Activity {
     	} else {
     		// TODO push this logic into the level manager
     		// TODO all strings should go to resources
-    		String title = "Pick a Stage";
+    		String title = getString(R.string.pick_a_stage);
     		int stagesCount = resources.getStagesCount();
     		if (stageCaptions.size() < stagesCount) {
-    			title = title + " (" + stageCaptions.size() + "/" + stagesCount + " unlocked)";
+    			title = title + " (" + stageCaptions.size() + "/" + stagesCount + " " + getString(R.string.unlocked)+ ")";
     		}
         	builder.setTitle(title);
 	    	String[] items = new String[stageCaptions.size()];
@@ -218,7 +241,7 @@ public class JaroActivity extends Activity {
 
 		String title = stage.getCaption();
 		if (levelCaptions.size() < size) {
-			title = title + " (" + levelCaptions.size() + "/" + size + " unlocked)";
+			title = title + " (" + levelCaptions.size() + "/" + size + " " + getString(R.string.unlocked)+ ")";
 		}
     	builder.setTitle(title);
 
@@ -244,10 +267,9 @@ public class JaroActivity extends Activity {
 	public void showLevelAdvanceMenu() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
     	builder.setTitle(R.string.level_passed);
-    	// TODO will this work?
-    	String caption = game.getModel().getLevelManager().getCurrentLevel().getCaption();
+    	String caption = game.getModel().getLevelManager().getNextLevel().getCaption();
     	String[] items = {
-    			"Next up... " + caption, // TODO how to make in bundle? 
+    			getString(R.string.next_up) + " " + caption, 
     			};
     	builder.setItems(items, new DialogInterface.OnClickListener() {
     	    public void onClick(DialogInterface dialog, int item) {

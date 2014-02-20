@@ -2,6 +2,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/choose_different_level"
           android:title="@string/choose_different_level" android:icon="@android:drawable/ic_menu_more"/>
+    <item android:id="@+id/choose_game_type"
+          android:title="@string/choose_game" android:icon="@android:drawable/ic_menu_more"/>
     <item android:id="@+id/quit"
           android:title="@string/quit" android:icon="@android:drawable/ic_menu_close_clear_cancel"/>
     <item android:id="@+id/undo_button"

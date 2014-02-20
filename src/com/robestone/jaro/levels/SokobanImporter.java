@@ -13,6 +13,8 @@ import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.robestone.jaro.levels.SokobanLevelParserHelper.FileEntryIndex;
+
 /**
  
  <div id="startLevel">
@@ -35,6 +37,9 @@ public class SokobanImporter {
 	// C:\Users\Jacob\eclipse-workspace-silver\jaro\res\raw
 	
 	public static void main(String[] args) throws Exception {
+		new SokobanImporter().createDbFromScratch();
+	}
+	public void downloadAllLevels() throws Exception {
 		int start = 1;
 		int end = 20000;
 		for (int i = start; i < end; i++) {
@@ -49,6 +54,18 @@ public class SokobanImporter {
 	
 	// http://www.game-sokoban.com/index.php?mode=level&lid=349
 	private String baseUrl = "http://www.game-sokoban.com/index.php?mode=level&lid=";
+
+	public void createDbFromScratch() throws Exception {
+		List<FileEntryIndex> infos = getAllPopularLevels();
+		// download the files
+		for (FileEntryIndex info: infos) {
+			saveLevel(info.id);
+		}
+		// create the db
+		SokobanLevelParserHelper helper = new SokobanLevelParserHelper(true);
+		helper.setCompressing(true, 13, 17);
+		helper.compressFiles(infos);
+	}
 	
 	public void saveLevel(int id) throws Exception {
 		String page = downloadPage(id);
@@ -227,9 +244,10 @@ public class SokobanImporter {
 		return ttype.substring(random, random + 1);
 	}
 	private void output(List<List<String>> grid, String cname, String name, String levelNumber) throws Exception {
-		File levelsDir = new File("C:\\Users\\Jacob\\eclipse-workspace-silver\\jaro\\res\\raw\\levels\\jarobanimports");
+		File levelsDir = new File("C:\\Users\\Jacob\\eclipse-workspace-silver\\jaro\\sokoban-downloads\\favorites");
 		cname = cname.replace(' ', '_');
 		name = name.replace(' ', '_');
+		name = name.replace('?', '_');
 		File cnameDir = new File(levelsDir, cname);
 		cnameDir.mkdirs();
 		
@@ -276,7 +294,7 @@ public class SokobanImporter {
 		buf.append(tokens.charAt(0));
 	}
 	private String getAttribute(String name, String page) {
-		Pattern p = Pattern.compile("<l\\s+.*?\\s" + name + "=\"([\\w\\s]+)\"");
+		Pattern p = Pattern.compile("<l\\s+.*?\\s" + name + "=\"(.+?)\"");
 		Matcher m = p.matcher(page);
 		if (m.find()) {
 			return m.group(1);
@@ -342,10 +360,17 @@ public class SokobanImporter {
 </div>
 
  	*/
-	public void popularityParser() throws Exception {
-		Pattern pattern = Pattern.compile("popular_item_.\" width=\"[0-9]+\" src=\"./pics/thumb_([0-9]+).gif");
+	public List<FileEntryIndex> getAllPopularLevels() throws Exception {
+		List<FileEntryIndex> infos = new ArrayList<FileEntryIndex>();
+		Pattern pattern = Pattern.compile(
+				"popular_item_.\" width=\"[0-9]+\" src=\"./pics/thumb_([0-9]+).gif" +
+				"\\s*\"title=\"&laquo;.*?&raquo;\\s*" + 
+				" completed ([0-9]+) time"
+				);
+		
 		// there are holes in the catalog
-		for (int i = 0; i < 142; i++) {
+		for (int i = 0; i < 150; i++) {
+			System.out.println("Download catalog: " + i);
 			// download the catalog - it might be blank
 			String url = "http://www.game-sokoban.com/index.php?mode=catalog&cid=" + i;
 			URLConnection con = new URL(url).openConnection();
@@ -353,10 +378,15 @@ public class SokobanImporter {
 			String page = Utils.toString(in);
 			Matcher m = pattern.matcher(page);
 			while (m.find()) {
+				FileEntryIndex info = new FileEntryIndex();
 				String id = m.group(1);
-				System.out.println(id);
+				info.id = Integer.parseInt(id);
+				String times = m.group(2);
+				info.completed = Integer.parseInt(times);
+				infos.add(info);
 			}
 		}
+		return infos;
 	}
 	
 }

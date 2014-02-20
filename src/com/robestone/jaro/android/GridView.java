@@ -85,6 +85,13 @@ public class GridView extends SurfaceView implements SurfaceHolder.Callback {
 	
 	@Override
 	protected void onDraw(Canvas canvas) {
+		// this was causing a concurrent modification on accessing the pieces
+		// check to ensure only one thread tries to draw at a time
+		synchronized (jaroView) {
+			onDrawInner(canvas);
+		}
+	}
+	protected void onDrawInner(Canvas canvas) {
 		super.onDraw(canvas);
 		
 		canvas.drawColor(Color.BLACK);

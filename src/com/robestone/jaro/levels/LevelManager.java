@@ -51,6 +51,12 @@ public class LevelManager {
 	 * This implementation is extremely inefficient for current storage
 	 */
 	public Level passCurrentLevel() {
+		Level nextLevel = getNextLevel();
+		levelPersister.setLevelUnlocked(nextLevel.getLevelKey());
+		levelPersister.setCurrentLevel(nextLevel.getLevelKey());
+		return nextLevel;
+	}
+	public Level getNextLevel() {
 		String currentLevel = levelPersister.getCurrentLevel();
 		String nextLevelKey = null;
 		boolean found = false;
@@ -73,9 +79,6 @@ public class LevelManager {
 		if (nextLevel == null) {
 			nextLevel = getFirstLevel();
 		}
-//		nextLevel.setUnlocked(true);
-		levelPersister.setLevelUnlocked(nextLevel.getLevelKey());
-		levelPersister.setCurrentLevel(nextLevel.getLevelKey());
 		return nextLevel;
 	}
 	public void setCurrentLevel(Level level) {
@@ -112,7 +115,8 @@ public class LevelManager {
 				}
 			}
 		}
-		return null;
+		// means we fell through due to switching games or some other case
+		return getFirstLevel();
 	}
 
 }

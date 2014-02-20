@@ -15,10 +15,18 @@ import com.robestone.jaro.Grid;
 import com.robestone.jaro.Piece;
 import com.robestone.jaro.piecerules.JaroPieceRules;
 
+/**
+ * TODO there are too many sokoban parse classes - need to merge, or reorganize
+ * @author Jacob
+ *
+ */
 public class SokobanLevelParserHelper {
 
 	private Map<String, String> fileNameMap = new HashMap<String, String>();
 	private boolean isDataSplitByNewline;
+	private boolean isCompressing = false;
+	private int maxColsToImport = -1;
+	private int maxRowsToImport = -1;
 	
 	public SokobanLevelParserHelper(boolean isDataSplitByNewline) {
 		addFileNameMappings();
@@ -164,6 +172,9 @@ public class SokobanLevelParserHelper {
 		return tokens;
 	}
 	private String getTurtle(String seedKey, String token, int count) {
+		if (isCompressing) {
+			return token;
+		}
 		int pos = count % seedKey.length();
 		int c = seedKey.charAt(pos);
 		c = (c % 4);
@@ -340,14 +351,16 @@ public class SokobanLevelParserHelper {
 		}
 	}
 	
-	private class FileEntryIndex {
-		String stage;
-		String level;
-		int cols;
-		int rows;
-		String data;
+	public static class FileEntryIndex {
+		public String stage;
+		public String level;
+		public int cols;
+		public int rows;
+		public String data;
+
+		public int id;
+		public int completed;
 	}
-	
 	/**
 	 * Create one master file with the following format
 	 * 
@@ -371,21 +384,29 @@ public class SokobanLevelParserHelper {
 		w2fa}aja{a6fw
 		w2f3wa3w2fw3fw
 	 */
-	public void compressFiles() throws Exception {
+	public void compressFiles(List<FileEntryIndex> existingInfo) throws Exception {
+		
+		// get the index information from the files
+		// need to merge that with existingInfo
 		List<FileEntryIndex> indexes = new ArrayList<FileEntryIndex>();
-		File dir = new File("C:\\Users\\Jacob\\eclipse-workspace-silver\\jaro\\parsed-sokoban\\levels\\s_006.Jaro-ban (10,000 Levels)");
+		File dir = new File("C:\\Users\\Jacob\\eclipse-workspace-silver\\jaro\\sokoban-downloads\\favorites");
 		File[] stages = dir.listFiles();
 		for (File stage: stages) {
 			File[] levels = stage.listFiles();
 			for (File level: levels) {
 				FileEntryIndex index = compressFile(level);
-				indexes.add(index);
+				if (index != null) {
+					indexes.add(index);
+				}
 			}
 		}
 		
+		// figure out which stages are easiest, and sort that way
+		
+		
 		// output
-		File dbFile = new File("C:\\Users\\Jacob\\eclipse-workspace-silver\\jaro\\parsed-sokoban\\levels\\db.txt");
-		File indexFile = new File("C:\\Users\\Jacob\\eclipse-workspace-silver\\jaro\\parsed-sokoban\\levels\\index.txt");
+		File dbFile = new File("C:\\Users\\Jacob\\eclipse-workspace-silver\\jaro\\sokoban-downloads\\db.txt");
+		File indexFile = new File("C:\\Users\\Jacob\\eclipse-workspace-silver\\jaro\\sokoban-downloads\\index.txt");
 //		FileOutputStream out = new FileOutputStream(compressed);
 		FileWriter dbWriter = new FileWriter(dbFile);
 		FileWriter indexWriter = new FileWriter(indexFile);
@@ -422,7 +443,7 @@ public class SokobanLevelParserHelper {
 	 * 	C:\Users\Jacob\eclipse-workspace-silver\jaro\parsed-sokoban\levels\s_006.Jaro-ban (10,000 Levels)\aenigma\l_001.soko_01.txt
 	 * s_NUM.Jaro-ban (10,000 Levels)\SUBSTAGE\1_NUM.NAME_NAME.txt
 	 */
-	private Pattern fileNamePattern = Pattern.compile(".*/s_[0-9]+\\..*/(.*)/l_[0-9]+\\.(.*)\\.txt");
+	private Pattern fileNamePattern = Pattern.compile(".*/(.*)/l_[0-9]+\\.(.*)\\.txt");
 	public FileEntryIndex compressFile(File file) throws Exception {
 		FileEntryIndex index = new FileEntryIndex();
 		// data in "old" format
@@ -433,6 +454,15 @@ public class SokobanLevelParserHelper {
 		index.cols = tokens.get(0).size();
 		index.rows = tokens.size();
 				
+		if (maxColsToImport > 0) {
+			if (maxRowsToImport < index.rows) {
+				return null;
+			}
+			if (maxColsToImport < index.cols) {
+				return null;
+			}
+		}
+		
 		data = data.replaceAll("[\\^<>v]", "t");
 		data = data.replaceAll("[A{}V]", "T");
 		data = compressDuplicateCells(data);
@@ -461,5 +491,10 @@ public class SokobanLevelParserHelper {
 		
 		String newData = SokobanImporter.toOutputRow(toCompress);
 		return newData;
+	}
+	public void setCompressing(boolean isCompressing, int maxColsToImport, int maxRowsToImport) {
+		this.isCompressing = isCompressing;
+		this.maxColsToImport = maxColsToImport;
+		this.maxRowsToImport = maxRowsToImport;
 	}
 }

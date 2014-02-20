@@ -8,9 +8,10 @@ import com.robestone.jaro.levels.LevelPersister;
 
 public class JaroPreferences implements LevelPersister {
 
-	private static final String CURRENT_LEVEL = "jaro.currentLevel";
+	private static final String CURRENT_LEVEL = "jaro.currentLevel.";
 	private static final String EULA = "jaro.eula";
 	private static final String LEVEL_UNLOCKED = "jaro.levelUnlocked.";
+	private static final String GAME_TYPE = "jaro.gameType";
 	
 	private SharedPreferences sharedPreferences;
 	
@@ -26,6 +27,14 @@ public class JaroPreferences implements LevelPersister {
 		editor.putBoolean(EULA, true);
 		editor.commit();
 	}
+	public void setGameType(String gameType) {
+		Editor editor = sharedPreferences.edit();
+		editor.putString(GAME_TYPE, gameType);
+		editor.commit();
+	}
+	public String getGameType() {
+		return sharedPreferences.getString(GAME_TYPE, HtmlResources.JARO_GAME_TYPE);
+	}
 	
 	@Override
 	public boolean isLevelUnlocked(String levelKey) {
@@ -35,12 +44,14 @@ public class JaroPreferences implements LevelPersister {
 	@Override
 	public void setCurrentLevel(String levelKey) {
 		Editor editor = sharedPreferences.edit();
-		editor.putString(CURRENT_LEVEL, levelKey);
+		String gameType = getGameType();
+		editor.putString(CURRENT_LEVEL + gameType, levelKey);
 		editor.commit();
 	}
 	@Override
 	public String getCurrentLevel() {
-		return sharedPreferences.getString(CURRENT_LEVEL, null);
+		String gameType = getGameType();
+		return sharedPreferences.getString(CURRENT_LEVEL + gameType, null);
 	}
 
 	@Override
