@@ -16,8 +16,8 @@ import com.robestone.jaro.levels.Stage;
 
 public class DbResources extends JaroAndroidResources {
 
-	public static final String GAME_TYPE = "Jaroban";
-	public static final String JARO_ASSETS_DIR = "stage-data/" + GAME_TYPE;
+	public static final String JAROBAN_GAME_TYPE = "Jaroban";
+	public static final String JARO_ASSETS_DIR = "stage-data/" + JAROBAN_GAME_TYPE;
 	public static final String INDEX_FILE = JARO_ASSETS_DIR + "/index.txt";
 	public static final String DB_FILE = JARO_ASSETS_DIR + "/db.txt";
 	public static final String DATA_TYPE = "db";

@@ -15,7 +15,7 @@ public class DbResourcesTest extends TestCase {
 		DbResources resources = new DbResources(assets);
 		
 		assertEquals("Alberto", resources.getStage(1).getStageKey());
-		assertEquals("Alberto Garcia Best 4 U", resources.getStage(2).getCaption());
+		assertEquals("Alberto Garcia 1", resources.getStage(2).getCaption());
 		
 		/*
 Alberto_Garcia_Plus_2
@@ -27,22 +27,23 @@ sokoboxes_plus_04:14:12
 		*/
 		assertEquals("sokoboxes plus 02", resources.getLevel("Alberto_Garcia_Plus_2", 1).getCaption());
 		assertEquals(7, resources.getLevel("Alberto_Garcia_Plus_2", 0).getCols());
-		assertEquals(12, resources.getLevel("Alberto_Garcia_Plus_2", 3).getRows());
+		assertEquals(13, resources.getLevel("Alberto_Garcia_Plus_2", 3).getRows());
 	}
 	// 2_8w2_2w2f
 	public void testParseGrid() throws Exception {
 		JaroAssets assets = new JaroFileAssets("assets");
 		DbResources resources = new DbResources(assets);
-		Level level = resources.getLevel("Sasquatch__V", 5);
+		Level level = resources.getLevel("Sasquatch__V", 3);
 		String gs = resources.getGridString(level);
 		System.out.println(gs);
+		// these aren't all that guaranteed to be the same, because it's based on downloading the favorite.
 //		Level level2 = resources.getLevel("Sasquatch__V", 6);
 		Grid g = resources.getGrid(level);
 		assertNotNull(g);
-		assertEquals(11, level.getCols());
+		assertEquals(13, level.getCols());
 		assertEquals(10, level.getRows());
 		System.out.println(g.toString());
-		Piece p = g.getPiece(4, 6);
+		Piece p = g.getPiece(8, 4);
 		assertEquals("jaro", p.getType());
 	}
 	

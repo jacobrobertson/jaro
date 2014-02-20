@@ -4,7 +4,7 @@
 	android:antialias="true"
 	>
 	<item android:drawable="@drawable/turtlenest1" android:duration="150" />
-	<item android:drawable="@drawable/turtlenest2" android:duration="150" />
-	<item android:drawable="@drawable/turtlenest3" android:duration="150" />
-	<item android:drawable="@drawable/turtlenest2" android:duration="150" />
+	<item android:drawable="@drawable/turtlenest2" android:duration="160" />
+	<item android:drawable="@drawable/turtlenest3" android:duration="155" />
+	<item android:drawable="@drawable/turtlenest2" android:duration="145" />
 </animation-list>
