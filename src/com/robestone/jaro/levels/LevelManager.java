@@ -52,6 +52,7 @@ public class LevelManager {
 	 */
 	public Level passCurrentLevel() {
 		Level nextLevel = getNextLevel();
+		levelPersister.setLevelPassed(levelPersister.getCurrentLevel());
 		levelPersister.setLevelUnlocked(nextLevel.getLevelKey());
 		levelPersister.setCurrentLevel(nextLevel.getLevelKey());
 		return nextLevel;
@@ -89,6 +90,9 @@ public class LevelManager {
 	}
 	public boolean isLevelUnlocked(Level level) {
 		return levelPersister.isLevelUnlocked(level.getLevelKey());
+	}
+	public boolean isLevelPassed(Level level) {
+		return levelPersister.isLevelPassed(level.getLevelKey());
 	}
 	private Level getFirstLevel() {
 		Stage s = jaroResources.getStage(0);

@@ -24,5 +24,13 @@ public class LevelPersisterMock implements LevelPersister {
 		
 	}
 
+	@Override
+	public boolean isLevelPassed(String levelKey) {
+		return false;
+	}
 	
+	@Override
+	public void setLevelPassed(String levelKey) {
+		
+	}
 }
