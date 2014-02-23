@@ -37,6 +37,7 @@ public class GridView extends SurfaceView implements SurfaceHolder.Callback {
 	private JaroAndroidView jaroView;
 	
 	private class CellInfo {
+		String spriteKey;
 		int currentFrame;
 		/**
 		 * Tells us when this frame was last drawn.
@@ -85,15 +86,12 @@ public class GridView extends SurfaceView implements SurfaceHolder.Callback {
 	
 	@Override
 	protected void onDraw(Canvas canvas) {
+		super.onDraw(canvas);
 		// this was causing a concurrent modification on accessing the pieces
 		// check to ensure only one thread tries to draw at a time
-		synchronized (jaroView) {
-			onDrawInner(canvas);
-		}
+		onDrawInner(canvas);
 	}
-	protected void onDrawInner(Canvas canvas) {
-		super.onDraw(canvas);
-		
+	protected void onDrawInner(Canvas canvas) {		
 		canvas.drawColor(Color.BLACK);
 		
 		boolean isLandscape = activity.isLandscape();
@@ -155,11 +153,13 @@ public class GridView extends SurfaceView implements SurfaceHolder.Callback {
 			}
 		}
 	}
-	private List<Drawable> getDrawables(int x, int y, boolean isLandscape) {
+	private synchronized List<Drawable> getDrawables(int x, int y, boolean isLandscape) {
 		List<Piece> pieces = jaroView.getPieces(x, y, isLandscape);
 		if (pieces == null) {
 			return null;
 		}
+		// TODO I really don't want to make a new ArrayList, but I need to figure out the concurrent modification issues on this
+		pieces = new ArrayList<Piece>(pieces);
 		List<Drawable> drawables = new ArrayList<Drawable>();
 		for (Piece piece: pieces) {
 			String spriteKey = jaroView.getSprite(piece, isLandscape);
@@ -169,38 +169,38 @@ public class GridView extends SurfaceView implements SurfaceHolder.Callback {
 			Drawable d = activity.getResources().getDrawable(id);
 			if (d instanceof AnimationDrawable) {
 				AnimationDrawable a = (AnimationDrawable) d;
-				boolean test = !true;
-				if (!test) {
-					CellInfo info = pieceAnimations.get(piece.getId());
-					if (info == null) {
-						info = new CellInfo();
-						pieceAnimations.put(piece.getId(), info);
-					}
-					// see if it's time to change to next frame or not
-					boolean next = false;
-					if (info.frameDrawTime == -1) {
-						next = true;
-					} else {
-						long requiredDuration = a.getDuration(info.currentFrame);
-						long actualDuration = System.currentTimeMillis() - info.frameDrawTime;
-						if (actualDuration >= requiredDuration) {
-							next = true;
-						}
-					}
-					if (next) {
-						info.currentFrame++;
-						if (info.currentFrame == a.getNumberOfFrames()) {
-							info.currentFrame = 0;
-						}
-						info.frameDrawTime = System.currentTimeMillis();
-					}
-					d = a.getFrame(info.currentFrame);
-					if (d == null) {
-						throw new IllegalStateException("Animation thread working against wrong map for sprite " + 
-								spriteKey + "/" + piece + " for AnimationDrawable " + a + ", frame=" + info.currentFrame);
-					}
+				CellInfo info = pieceAnimations.get(piece.getId());
+				if (info == null) {
+					info = new CellInfo();
+					info.spriteKey = spriteKey;
+					pieceAnimations.put(piece.getId(), info);
+				}
+				// see if it's time to change to next frame or not
+				boolean next = false;
+				if (info.frameDrawTime == -1) {
+					next = true;
 				} else {
-					d = a.getFrame(0);
+					long requiredDuration = a.getDuration(info.currentFrame);
+					long actualDuration = System.currentTimeMillis() - info.frameDrawTime;
+					if (actualDuration >= requiredDuration) {
+						next = true;
+					}
+				}
+				if (next) {
+					info.currentFrame++;
+					info.frameDrawTime = System.currentTimeMillis();
+				}
+				if (info.currentFrame >= a.getNumberOfFrames()) {
+					info.currentFrame = 0;
+				}
+				d = a.getFrame(info.currentFrame);
+				
+				if (d == null) {
+					throw new IllegalStateException(
+							"Animation thread working against wrong map for sprite " + spriteKey + ".\n" + 
+									"Current piece: " + piece + "\n" +
+									"Info spriteKey: " + info.spriteKey + "\n" +
+									"AnimationDrawable " + a + ", " + "frame=" + info.currentFrame + "; a.getNumberOfFrames=" + a.getNumberOfFrames());
 				}
 			}
 			if (d == null) {

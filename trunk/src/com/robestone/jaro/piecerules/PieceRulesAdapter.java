@@ -103,12 +103,15 @@ public class PieceRulesAdapter implements PieceRules {
 			underscore = dot;
 		}
 		String type = parseKey.substring(0, underscore);
-		if (type != null && type.equals(getTypeId())) {
+		if (isParseTypeForPiece(type)) {
 			String state = parseKey.substring(0, dot);
 			return buildPiece(type, state);
 		} else {
 			return null;
 		}
+	}
+	protected boolean isParseTypeForPiece(String parseType) {
+		return parseType.equals(getTypeId());
 	}
 	
 	/**

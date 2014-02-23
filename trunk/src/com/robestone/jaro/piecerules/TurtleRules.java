@@ -39,11 +39,10 @@ public class TurtleRules extends PieceRulesAdapter {
 		Action action = getAction(turtle, userAction);
 		return action.toList();
 	}
-	@Override
-	public boolean isLegal(Action proposedAction, JaroModel model) {
+	protected boolean isActionForTurtleMove(Action proposedAction, JaroModel model) {
 		// we only care about pushing
 		if (!proposedAction.isMovePiece()) {
-			return true;
+			return false;
 		}
 		
 		int toX = proposedAction.getToX();
@@ -53,16 +52,25 @@ public class TurtleRules extends PieceRulesAdapter {
 		// see if we're trying to move onto a turtle
 		Piece maybeTurtle = grid.getPiece(toX, toY);
 		if (maybeTurtle == null) {
-			return true;
+			return false;
 		}
 		if (!TURTLE_TYPE_ID.equals(maybeTurtle.getType())) {
+			return false;
+		}
+		return true;
+	}
+	
+	@Override
+	public boolean isLegal(Action proposedAction, JaroModel model) {
+		if (!isActionForTurtleMove(proposedAction, model)) {
 			return true;
 		}
-
+		
 		// are we trying to push it off the screen?
 		// --- we don't care - we'll always have cave walls there
 		
 		// check the grid and see if we can move the turtle over or not
+		Grid grid = model.getGrid();
 		Piece otherSide = getOtherSide(proposedAction, grid);
 		
 		// if there's nothing there, we can push it
@@ -71,7 +79,7 @@ public class TurtleRules extends PieceRulesAdapter {
 		}
 		
 		// we know there's something there, so it's only legal if other side is a hole
-		boolean isTurtleHole = TurtleHoleRules.isEmptyHole(otherSide);
+		boolean isTurtleHole = TurtleHoleRules.TURTLE_HOLE_TYPE_ID.equals(otherSide.getType());
 		if (isTurtleHole) {
 			return true;
 		}
@@ -109,7 +117,7 @@ public class TurtleRules extends PieceRulesAdapter {
 		int y2 = turtleY + yd;
 		return new Action(turtle, turtleX, turtleY, x2, y2);
 	}
-	private SpriteMapper buildSpriteMapper() {
+	protected SpriteMapper buildSpriteMapper() {
 		SpriteMapper map = new SpriteMapper();
 		map.addMatch(TURTLE_TYPE_ID, null, TURTLE_STATE_LEFT, TURTLE_STATE_LEFT, TURTLE_STATE_DOWN);
 		map.addMatch(TURTLE_TYPE_ID, null, TURTLE_STATE_RIGHT, TURTLE_STATE_RIGHT, TURTLE_STATE_UP);

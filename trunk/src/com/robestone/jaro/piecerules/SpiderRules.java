@@ -27,20 +27,20 @@ public class SpiderRules extends EatableRules {
 		
 		Grid grid = model.getGrid();
 		// get spiders, but if there are none, don't bother
-		List<Piece> spiders = grid.getPieces(SPIDER_TYPE_ID, SPIDER_BIG_STATE);
+		List<Piece> spiders = grid.getPiecesWithState(SPIDER_TYPE_ID, SPIDER_BIG_STATE);
 		if (spiders.isEmpty()) {
 			return actions;
 		}
 
 		// get all empty bushes - if there are any, then we're done
-		List<Piece> emptyBushes = grid.getPieces(BushRules.BUSH_TYPE_ID, BushRules.BUSH_EMPTY_STATE);
+		List<Piece> emptyBushes = grid.getPiecesWithState(BushRules.BUSH_TYPE_ID, BushRules.BUSH_EMPTY_STATE);
 		if (!emptyBushes.isEmpty()) {
 			return actions;
 		}
 		
 		// get all bird bushes - if there are none, then that's odd, but it means
 		// it's a level with spiders, and no bushes?
-		List<Piece> birdBushes = grid.getPieces(BushRules.BUSH_TYPE_ID, BushRules.BUSH_WITH_BIRD_STATE);
+		List<Piece> birdBushes = grid.getPiecesWithState(BushRules.BUSH_TYPE_ID, BushRules.BUSH_WITH_BIRD_STATE);
 		if (birdBushes.isEmpty()) {
 			return actions;
 		}
