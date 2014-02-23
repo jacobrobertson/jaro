@@ -10,5 +10,8 @@ public interface LevelPersister {
 	void setLevelUnlocked(String levelKey);
 	void setCurrentLevel(String levelKey);
 	String getCurrentLevel();
-	
+
+	boolean isLevelPassed(String levelKey);
+	void setLevelPassed(String levelKey);
+
 }

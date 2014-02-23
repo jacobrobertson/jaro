@@ -11,6 +11,7 @@ public class JaroPreferences implements LevelPersister {
 	private static final String CURRENT_LEVEL = "jaro.currentLevel.";
 	private static final String EULA = "jaro.eula";
 	private static final String LEVEL_UNLOCKED = "jaro.levelUnlocked.";
+	private static final String LEVEL_PASSED = "jaro.levelPassed.";
 	private static final String GAME_TYPE = "jaro.gameType";
 	
 	private SharedPreferences sharedPreferences;
@@ -42,6 +43,11 @@ public class JaroPreferences implements LevelPersister {
 	}
 	
 	@Override
+	public boolean isLevelPassed(String levelKey) {
+		return sharedPreferences.getBoolean(LEVEL_PASSED + levelKey, false);
+	}
+	
+	@Override
 	public void setCurrentLevel(String levelKey) {
 		Editor editor = sharedPreferences.edit();
 		String gameType = getGameType();
@@ -58,6 +64,13 @@ public class JaroPreferences implements LevelPersister {
 	public void setLevelUnlocked(String levelKey) {
 		Editor editor = sharedPreferences.edit();
 		editor.putBoolean(LEVEL_UNLOCKED + levelKey, true);
+		editor.commit();
+	}
+
+	@Override
+	public void setLevelPassed(String levelKey) {
+		Editor editor = sharedPreferences.edit();
+		editor.putBoolean(LEVEL_PASSED + levelKey, true);
 		editor.commit();
 	}
 

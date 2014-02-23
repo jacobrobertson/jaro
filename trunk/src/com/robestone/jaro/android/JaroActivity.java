@@ -15,6 +15,7 @@ import android.view.View;
 import com.robestone.jaro.levels.JaroAssets;
 import com.robestone.jaro.levels.JaroResources;
 import com.robestone.jaro.levels.Level;
+import com.robestone.jaro.levels.LevelManager;
 import com.robestone.jaro.levels.Stage;
 
 public class JaroActivity extends Activity {
@@ -55,7 +56,6 @@ public class JaroActivity extends Activity {
 	 */
 	private boolean isShowAllLevels() {
 		JaroPreferences prefs = new JaroPreferences(this);
-		JaroAndroidResources resources;
 		String gameType = prefs.getGameType();
 		if (HtmlResources.JARO_GAME_TYPE.equals(gameType)) {
 			return false;
@@ -188,26 +188,45 @@ public class JaroActivity extends Activity {
     private boolean showChooseStageMenu() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		final JaroResources resources = game.getJaroResources();
+		
+		// build the captions for all unlocked stages
     	List<String> stageCaptions = new ArrayList<String>();
     	Stage stage1 = null;
+		boolean showAll = isShowAllLevels();
+		LevelManager levelManager = game.getModel().getLevelManager();
     	for (Stage stage: game.getJaroResources().getStages()) {
     		if (stage1 == null) {
     			stage1 = stage;
     		}
     		String stageKey = stage.getStageKey();
-    		boolean unlocked = isShowAllLevels();
-    		if (!unlocked) {
-        		Level level = resources.getLevel(stageKey, 0);
-    			unlocked = game.getModel().getLevelManager().isLevelUnlocked(level);
+    		boolean stagePassed = true;
+    		boolean anyLevelPassed = false;
+    		boolean stageUnlocked = showAll;
+    		
+    		// determine if stage is completely passed or not
+    		for (Level level: resources.getLevels(stageKey)) {
+    			stageUnlocked = stageUnlocked || levelManager.isLevelUnlocked(level);
+    			boolean levelPassed = levelManager.isLevelPassed(level);
+    			stagePassed = stagePassed && levelPassed;
+    			anyLevelPassed = anyLevelPassed || levelPassed;
     		}
+    		
     		// TODO I want to make a better algorithm than this.  for example, if you pass
     		//		a certain percent of a stage, it unlocks the next stage
     		//		also, it should show the stages greyed out rather than just not showing up
-    		if (!unlocked) {
+    		if (!stageUnlocked) {
     			break;
     		}
-       		stageCaptions.add(stage.getCaption());
+    		String caption = stage.getCaption();
+    		if (stagePassed) {
+    			caption = "* " + caption;
+    		} else if (anyLevelPassed) {
+    			caption = "+ " + caption;
+    		}
+       		stageCaptions.add(caption);
     	}
+    	
+    	// create the dialog
     	if (stageCaptions.size() == 1) {
     		return showChooseLevelMenu(stage1);
     	} else {
@@ -239,19 +258,17 @@ public class JaroActivity extends Activity {
 		final JaroResources resources = game.getJaroResources();
     	List<String> levelCaptions = new ArrayList<String>();
     	int size = resources.getLevelsCount(stage.getStageKey());
+		boolean showAll = isShowAllLevels();
 		for (int i = 0; i < size; i++) {
-    		boolean showAllLevels = isShowAllLevels();
     		Level level = resources.getLevel(stage.getStageKey(), i);
-    		boolean unlocked = game.getModel().getLevelManager().isLevelUnlocked(level);
-    		if (!(unlocked || showAllLevels)) {
+    		boolean unlocked = showAll || game.getModel().getLevelManager().isLevelUnlocked(level);
+    		if (!unlocked) {
     			break;
     		}
     		String caption = ((i + 1) + ". " + level.getCaption());
-    		// TODO revisit this behavior - the whole "unlocked" isn't working like "passed" which is actually what I want
-    		//		-- most likely just add a new flag for "passed"
-//    		if (unlocked && showAllLevels) {
-//    			caption = "* " + caption;
-//    		}
+    		if (game.getModel().getLevelManager().isLevelPassed(level)) {
+    			caption = "* " + caption;
+    		}
     		levelCaptions.add(caption);
 		}
 
