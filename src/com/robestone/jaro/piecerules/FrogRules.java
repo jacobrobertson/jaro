@@ -19,15 +19,24 @@ public class FrogRules extends EatableRules {
 		if (actions == null) {
 			actions = new ArrayList<Action>();
 		}
-		
-		// if we ate the frog, then also do all the mists
 		int actionsCount = actions.size();
-		int frogsCount = model.getGrid().countPieces(FROG_TYPE_ID, null);
-		int totalCount = frogsCount - actionsCount;
-		if (totalCount == 0) {
-			List<Piece> mistPieces = model.getGrid().getPieces(MistRules.MIST_TYPE_ID, MistRules.MIST_TYPE_ID);
-			for (Piece mist: mistPieces) {
-				actions.add(new Action(mist, MistRules.MIST_WEAK));
+		
+		// if we are going to eat a frog, then trigger the turtles, and check the mist too
+		if (actionsCount > 0) {
+			List<Piece> stubbornTurtlePieces = model.getGrid().getPieces(StubbornTurtleRules.TURTLE_TYPE_ID, StubbornTurtleRules.TURTLESTUBBORN_SUB_TYPE, null);
+			for (Piece turtle: stubbornTurtlePieces) {
+				Object oldState = turtle.getState();
+				Object newState = StubbornTurtleRules.rotateState(oldState);
+				actions.add(new Action(turtle, newState));
+			}
+		
+			// if the last frog is about to be eaten, then trigger the mist
+			int frogsCount = model.getGrid().countPieces(FROG_TYPE_ID, null);
+			if (frogsCount == 1) {
+				List<Piece> mistPieces = model.getGrid().getPiecesWithState(MistRules.MIST_TYPE_ID, MistRules.MIST_TYPE_ID);
+				for (Piece mist: mistPieces) {
+					actions.add(new Action(mist, MistRules.MIST_WEAK));
+				}
 			}
 		}
 		return actions;

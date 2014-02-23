@@ -59,6 +59,6 @@ public class JaroView {
 				return id;
 			}
 		}
-		return null;
+		throw new IllegalArgumentException("Could not find a matching sprite for " + p.getType() + "/" +  p.getSubType() + "/" + p.getState());
 	}
 }

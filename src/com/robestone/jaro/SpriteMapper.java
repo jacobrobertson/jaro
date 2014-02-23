@@ -52,7 +52,8 @@ public class SpriteMapper {
 				}
 			}
 		}
-		throw new IllegalArgumentException("Could not find a matching sprite for " + piece.getType() + "/" +  piece.getSubType() + "/" + piece.getState());
+		// return null - because another similar sprite mapper may pick it up
+		return null;
 	}
 	public void addMatch(String type, String subType, String spriteId, String spriteIdLandscape) {
 		addMatch(type, subType, null, spriteId, spriteIdLandscape);

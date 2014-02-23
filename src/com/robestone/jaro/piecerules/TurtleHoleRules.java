@@ -46,4 +46,11 @@ public class TurtleHoleRules extends PieceRulesAdapter {
 		return TURTLE_HOLE_TYPE_ID.equals(p.getType()) &&
 				TURTLE_HOLE_WITH_SNAKE.equals(p.getState());
 	}
+	
+	@Override
+	public boolean isOkayToEndLevel(JaroModel model) {
+		int countSnakes = model.getGrid().countPieces(TURTLE_HOLE_TYPE_ID, TURTLE_HOLE_WITH_SNAKE);
+		return countSnakes == 0;
+	}
+
 }

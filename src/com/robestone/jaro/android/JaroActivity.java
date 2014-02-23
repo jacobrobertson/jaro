@@ -19,7 +19,7 @@ import com.robestone.jaro.levels.Stage;
 
 public class JaroActivity extends Activity {
 
-	private boolean showAllLevels = false;
+//	private boolean showAllLevels = true;
 	
 	private JaroAndroidGame game;
 
@@ -48,6 +48,19 @@ public class JaroActivity extends Activity {
 			} else {
 				showAbout();
 			}
+		}
+	}
+	/**
+	 * TODO could make this a preference, etc.
+	 */
+	private boolean isShowAllLevels() {
+		JaroPreferences prefs = new JaroPreferences(this);
+		JaroAndroidResources resources;
+		String gameType = prefs.getGameType();
+		if (HtmlResources.JARO_GAME_TYPE.equals(gameType)) {
+			return false;
+		} else {
+			return true;
 		}
 	}
 	private void createGame() {
@@ -182,7 +195,7 @@ public class JaroActivity extends Activity {
     			stage1 = stage;
     		}
     		String stageKey = stage.getStageKey();
-    		boolean unlocked = showAllLevels;
+    		boolean unlocked = isShowAllLevels();
     		if (!unlocked) {
         		Level level = resources.getLevel(stageKey, 0);
     			unlocked = game.getModel().getLevelManager().isLevelUnlocked(level);
@@ -227,16 +240,19 @@ public class JaroActivity extends Activity {
     	List<String> levelCaptions = new ArrayList<String>();
     	int size = resources.getLevelsCount(stage.getStageKey());
 		for (int i = 0; i < size; i++) {
-    		boolean unlocked = showAllLevels;
-    		Level level = null;
-    		if (!unlocked) {
-    			level = resources.getLevel(stage.getStageKey(), i); 
-    			unlocked = game.getModel().getLevelManager().isLevelUnlocked(level);
-    		}
-    		if (!unlocked) {
+    		boolean showAllLevels = isShowAllLevels();
+    		Level level = resources.getLevel(stage.getStageKey(), i);
+    		boolean unlocked = game.getModel().getLevelManager().isLevelUnlocked(level);
+    		if (!(unlocked || showAllLevels)) {
     			break;
     		}
-    		levelCaptions.add((i + 1) + ". " + level.getCaption());
+    		String caption = ((i + 1) + ". " + level.getCaption());
+    		// TODO revisit this behavior - the whole "unlocked" isn't working like "passed" which is actually what I want
+    		//		-- most likely just add a new flag for "passed"
+//    		if (unlocked && showAllLevels) {
+//    			caption = "* " + caption;
+//    		}
+    		levelCaptions.add(caption);
 		}
 
 		String title = stage.getCaption();

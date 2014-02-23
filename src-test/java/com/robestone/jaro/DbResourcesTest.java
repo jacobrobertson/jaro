@@ -44,7 +44,7 @@ sokoboxes_plus_04:14:12
 		assertEquals(10, level.getRows());
 		System.out.println(g.toString());
 		Piece p = g.getPiece(8, 4);
-		assertEquals("jaro", p.getType());
+		assertEquals("cave", p.getType());
 	}
 	
 }

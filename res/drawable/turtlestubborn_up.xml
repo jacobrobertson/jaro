@@ -3,6 +3,8 @@
 	android:oneshot="false"
 	android:antialias="true"
 	>
-	<item android:drawable="@drawable/turtlestubborn_up1" android:duration="2500" />
-	<item android:drawable="@drawable/turtlestubborn_up2" android:duration="500" />
+	<item android:drawable="@drawable/turtlestubborn_up1" android:duration="2431" />
+	<item android:drawable="@drawable/turtlestubborn_up2" android:duration="422" />
+	<item android:drawable="@drawable/turtlestubborn_up1" android:duration="2502" />
+	<item android:drawable="@drawable/turtlestubborn_up2" android:duration="505" />
 </animation-list>

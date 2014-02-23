@@ -26,4 +26,11 @@ public class BushRules extends PieceRulesAdapter {
 		}
 		return null;
 	}
+	
+	@Override
+	public boolean isOkayToEndLevel(JaroModel model) {
+		int countEmptyBushes = model.getGrid().countPieces(BUSH_TYPE_ID, BUSH_EMPTY_STATE);
+		return countEmptyBushes == 0;
+	}
+
 }

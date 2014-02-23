@@ -22,10 +22,10 @@ public class JaroModel {
 		this.jaroResources = jaroResources;
 	}
 	
-	public Grid getGrid() {
+	public synchronized Grid getGrid() {
 		return grids.getLast();
 	}
-	public void setLevelGrid(Grid grid) {
+	public synchronized void setLevelGrid(Grid grid) {
 		this.grids = new LinkedList<Grid>();
 		this.grids.add(grid);
 		saveJaroPosition();
@@ -68,13 +68,13 @@ public class JaroModel {
 	/**
 	 * Just switch back to the previous grid if possible.
 	 */
-	public void undo() {
+	public synchronized void undo() {
 		if (grids.size() > 1) {
 			grids.removeLast();
 			saveJaroPosition();
 		}
 	}
-	public void rollbackAllMoves() {
+	public synchronized void rollbackAllMoves() {
 		while (grids.size() > 1) {
 			grids.removeLast();
 		}
@@ -100,7 +100,7 @@ public class JaroModel {
 	/**
 	 * Creates a new grid for the undo chain.
 	 */
-	public void cloneCurrent() {
+	public synchronized void cloneCurrent() {
 		// remove a lot, but always leave the first
 		Grid first = grids.removeFirst();
 		while (grids.size() > maxMovesToSave) {

@@ -68,14 +68,19 @@ public class Grid {
 		}
 		return count;
 	}
-	public List<Piece> getPieces(String type, Object state) {
+	public List<Piece> getPiecesWithState(String type, Object state) {
+		return getPieces(type, null, state);
+	}
+	public List<Piece> getPieces(String type, String subType, Object state) {
 		List<Piece> get = new ArrayList<Piece>();
 		for (List<Piece> area: pieces.values()) {
 			for (Piece p: area) {
 				String ptype = p.getType();
 				if (ptype.equals(type)) {
-					if (state == null || p.getState().equals(state)) {
-						get.add(p);
+					if (state == null || state.equals(p.getState())) {
+						if (subType == null || subType.equals(p.getSubType())) {
+							get.add(p);
+						}
 					}
 				}
 			}

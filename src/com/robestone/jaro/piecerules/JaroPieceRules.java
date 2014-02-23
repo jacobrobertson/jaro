@@ -28,6 +28,7 @@ public class JaroPieceRules {
 			pieceRules.add(new TurtleRules());
 			pieceRules.add(new TurtleHoleRules());
 			pieceRules.add(new TurtleNestRules());
+			pieceRules.add(new StubbornTurtleRules());
 		}
 		return pieceRules;
 	}
