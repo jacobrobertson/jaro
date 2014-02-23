@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello">Meet Jaro the adventurous bat</string>
+    <string name="app_name">Jaro</string>
+    <string name="level_passed">Good work, Jaro!</string>
+    <string name="continue_text">Continue</string>
+    
+    <string name="start_level_over">Start Level Over</string>
+    <string name="choose_different_level">Choose Different Level</string>
+    <string name="choose_level">Choose Level</string>
+    <string name="quit">Quit</string>
+    <string name="undo">Undo Move</string>
+    <string name="zoom">Zoom In/Out</string>
+    
+    <string name="close_about">I Agree</string>
+    <string name="about"><b>Jaro</b> is currently <u>Beta</u> software.
+      
+    This means it may have some bugs and limitations, and there aren\'t all that many levels. 
+    
+    However, it should be improving quite a bit in the near future.</string>
+    <string name="pick_a_stage">Pick a Stage</string>
+    <string name="choose_game">Choose Game</string>
+    <string name="unlocked">unlocked</string>
+    <string name="next_up">Next Up ...</string>
+</resources>
