@@ -10,7 +10,6 @@ import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Path;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
@@ -29,8 +28,10 @@ public class GesturesOverlay extends View implements OnTouchListener {
 	private int alphaFadingIndex;
 	private List<Paint> fadingPaint;
 	private boolean dragging = false;
+	private int currentDrags;
 	private float dragX;
 	private float dragY;
+	
 	private JaroController controller;
 	private JaroAndroidView jaroView;
 	private JaroActivity activity;
@@ -74,21 +75,23 @@ public class GesturesOverlay extends View implements OnTouchListener {
         
     }
 	public boolean onTouch(View view, MotionEvent event) {
-		Log.i("GesturesOverly", "onTouch." + event.getAction());
+//		Log.i("GesturesOverly", "onTouch." + event.getAction() + "." + currentDrags);
 		if (event.getAction() == MotionEvent.ACTION_DOWN) {
 			dragging = false;
+			currentDrags = 0;
 			dragX = event.getX();
 			dragY = event.getY();
 		} else if (event.getAction() == MotionEvent.ACTION_MOVE) {
 			dragging = true;
 			Direction dir = getDirectionFromDrag(event.getX(), event.getY());
 			if (dir != null) {
+				currentDrags++;
 				dragX = event.getX();
 				dragY = event.getY();
 				sendDirection(dir);
 			}
 		} else if (event.getAction() == MotionEvent.ACTION_UP) {
-			if (!dragging) {
+			if (!dragging || currentDrags == 0) {
 				Direction dir = getDirection((int) event.getX(), (int) event.getY());
 				sendDirection(dir);
 				startFading(dir);
