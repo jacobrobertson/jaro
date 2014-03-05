@@ -1,5 +1,7 @@
 package com.robestone.jaro.levels;
 
+import com.robestone.jaro.android.HtmlResources;
+
 
 /**
  * Responsibilities (of this package)
@@ -16,44 +18,24 @@ package com.robestone.jaro.levels;
  */
 public class LevelManager {
 
+	private static final float PERCENT_TO_UNLOCK_NEXT = .7f;
+	
 	private LevelPersister levelPersister;
 	private JaroResources jaroResources;
 	
 	public LevelManager(LevelPersister levelPersister, JaroResources jaroResources) {
 		this.levelPersister = levelPersister;
 		this.jaroResources = jaroResources;
-//		readUnlockedState();
-		setFirstStageUnlocked();
 	}
 
-	private void setFirstStageUnlocked() {
-		String stageKey = jaroResources.getStage(0).getStageKey();
-		Level level1 = jaroResources.getLevel(stageKey, 0);
-//		level1.setUnlocked(true);
-		// this is new - but needed because we are not keeping levels in memory
-		levelPersister.setLevelUnlocked(level1.getLevelKey());
-	}
-	/*
-	private void readUnlockedState() {
-		for (Stage stage: jaroResources.getStages()) {
-			String stageKey = stage.getStageKey();
-			for (Level level: jaroResources.getLevels(stageKey)) {
-				String levelKey = level.getLevelKey();
-				boolean unlocked = levelPersister.isLevelUnlocked(levelKey);
-				level.setUnlocked(unlocked);
-			}
-		}
-	}
-	*/
-	
 	/**
 	 * Marks current level as passed, and moves to the next level.
 	 * This implementation is extremely inefficient for current storage
 	 */
 	public Level passCurrentLevel() {
 		Level nextLevel = getNextLevel();
-		levelPersister.setLevelPassed(levelPersister.getCurrentLevel());
-		levelPersister.setLevelUnlocked(nextLevel.getLevelKey());
+		String currentLevelKey = levelPersister.getCurrentLevel();
+		levelPersister.setLevelPassed(currentLevelKey);
 		levelPersister.setCurrentLevel(nextLevel.getLevelKey());
 		return nextLevel;
 	}
@@ -86,13 +68,105 @@ public class LevelManager {
 		levelPersister.setCurrentLevel(level.getLevelKey());
 	}
 	public boolean isLevelUnlocked(String levelKey) {
-		return levelPersister.isLevelUnlocked(levelKey);
+		return isLevelUnlocked(getLevel(levelKey));
 	}
 	public boolean isLevelUnlocked(Level level) {
-		return levelPersister.isLevelUnlocked(level.getLevelKey());
+		if (isLevelPassed(level)) {
+			return true;
+		}
+		// a level is only unlocked if the stage is unlocked
+		for (Stage stage: jaroResources.getStages()) {
+			if (stage.getStageKey().equals(level.getStageKey())) {
+				if (!isStageUnlocked(stage)) {
+					return false;
+				}
+				break;
+			}
+		}
+		// a level is unlocked if it is the first level of the stage,
+		// or if the previous level is passed
+		int count = jaroResources.getLevelsCount(level.getStageKey());
+		Level previous = null;
+		for (int i = 0; i < count; i++) {
+			Level other = jaroResources.getLevel(level.getStageKey(), i);
+			if (other.getLevelKey().equals(level.getLevelKey())) {
+				if (i == 0) {
+					return true;
+				} else if (isLevelPassed(previous)) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+			previous = other;
+		}
+		return false;
 	}
 	public boolean isLevelPassed(Level level) {
 		return levelPersister.isLevelPassed(level.getLevelKey());
+	}
+	public boolean isStagePassed(Stage stage) {
+		for (Level level: jaroResources.getLevels(stage.getStageKey())) {
+			if (!isLevelPassed(level)) {
+				return false;
+			}
+		}
+		return true;
+	}
+	public boolean isStageWorkedOn(Stage stage) {
+		for (Level level: jaroResources.getLevels(stage.getStageKey())) {
+			if (isLevelPassed(level)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	public boolean isStageUnlocked(Stage stage) {
+		// if any of the levels are passed that is a no-brainer
+		for (Level level: jaroResources.getLevels(stage.getStageKey())) {
+			if (isLevelPassed(level)) {
+				return true;
+			}
+		}
+		// first stage is always unlocked
+		if (stage.getStageKey().equals(jaroResources.getStage(0).getStageKey())) {
+			return true;
+		}
+		Stage previous = null;
+		int count = jaroResources.getStagesCount();
+		for (int i = 0; i < count; i++) {
+			Stage other = jaroResources.getStage(i);
+			if (other.getStageKey().equals(stage.getStageKey())) {
+				if (i == 0) {
+					// first stage is always unlocked
+					return true;
+				} else if (isStageUnlocked(previous)) {
+					// check the percentage
+					float passed = getPercentagePassed(previous);
+					return (passed >= PERCENT_TO_UNLOCK_NEXT);
+				} else {
+					// can't be unlocked if previous stage is still locked
+					return false;
+				}
+			}
+			previous = other;
+		}
+		throw new IllegalArgumentException("Wasn't able to determine lock state of stage " + stage.getStageKey());
+	}
+	public float getPercentagePassed(Stage stage) {
+		float total = 0;
+		float passed = 0;
+		for (Level level: jaroResources.getLevels(stage.getStageKey())) {
+			if (isLevelPassed(level)) {
+				passed++;
+			}
+			total++;
+		}
+		return passed / total;
+	}
+	private static final boolean SHOW_ALL_LEVELS = false;
+	public boolean isShowAllLevels() {
+		return SHOW_ALL_LEVELS;
 	}
 	private Level getFirstLevel() {
 		Stage s = jaroResources.getStage(0);

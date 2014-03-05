@@ -10,6 +10,7 @@ import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Path;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
@@ -73,6 +74,7 @@ public class GesturesOverlay extends View implements OnTouchListener {
         
     }
 	public boolean onTouch(View view, MotionEvent event) {
+		Log.i("GesturesOverly", "onTouch." + event.getAction());
 		if (event.getAction() == MotionEvent.ACTION_DOWN) {
 			dragging = false;
 			dragX = event.getX();

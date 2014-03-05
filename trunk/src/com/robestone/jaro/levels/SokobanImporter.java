@@ -2,17 +2,26 @@ package com.robestone.jaro.levels;
 
 import java.awt.Point;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.robestone.jaro.JaroFileAssets;
+import com.robestone.jaro.android.DbResources;
 import com.robestone.jaro.levels.SokobanLevelParserHelper.FileEntryIndex;
 
 /**
@@ -37,17 +46,164 @@ public class SokobanImporter {
 	// C:\Users\Jacob\eclipse-workspace-silver\jaro\res\raw
 	
 	public static void main(String[] args) throws Exception {
-		new SokobanImporter().createDbFromScratch();
+		new SokobanImporter().
+		createRankedIndex()
+//		createStatisticsFile()
+//		createDbFromDownloadedFiles()
+//		downloadAllLevels()
+//		downloadAllLevels(473, 473)
+//		createStatisticsFile(2838, 2838)
+		;
 	}
-	public void downloadAllLevels() throws Exception {
-		int start = 1;
-		int end = 20000;
-		for (int i = start; i < end; i++) {
+	private void downloadAllLevels() throws Exception {
+		downloadAllLevels(1, 18000, "all-collections");
+	}
+	private void downloadAllLevels(int start, int end, String folderName) throws Exception {
+		// 14254
+		String rootDir = "C:\\Users\\Jacob\\eclipse-workspace-silver\\jaro\\sokoban-downloads\\" + folderName;
+		for (int i = start; i <= end; i++) {
+			System.out.println("Level Id: " + i);
+			saveLevel(rootDir, i);
+		}
+	}
+	
+	
+	private static class PopularitySorter implements Comparator<FileEntryIndex> {
+		@Override
+		public int compare(FileEntryIndex o1, FileEntryIndex o2) {
+			return o2.completed - o1.completed;
+		}
+	}
+	private void addRowAndColumn(List<FileEntryIndex> infos, String rootDir) {
+		JaroAssets assets = new JaroFileAssets(rootDir);
+		DbResources resources = new DbResources(assets);
+		for (FileEntryIndex info: infos) {
+			for (Level level: resources.getLevels(info.stage)) {
+				if (level.getLevelKey().equals(info.level)) {
+					info.rows = level.getRows();
+					info.cols = level.getCols();
+					break;
+				}
+			}
+		}
+	}
+	private List<FileEntryIndex> parseStatisticsFile(String path) throws Exception {
+		List<FileEntryIndex> infos = new ArrayList<FileEntryIndex>();
+		String data = Utils.toString(new FileInputStream(path));
+		String[] lines = data.split("\n");
+		for (String line: lines) {
+			String[] values = line.split("\\|");
+			FileEntryIndex info = new FileEntryIndex();
+			int i = 0;
+			info.stage = values[i++];
+			info.level = values[i++];
+			info.moves = Integer.parseInt(values[i++]);
+			info.completed = Integer.parseInt(values[i++]);
+			info.turtles = Integer.parseInt(values[i++]);
+			info.floorTiles = Integer.parseInt(values[i++]);
+			// some haven't ever been run, and this will mess up the sorting
+			if (info.completed > 0) {
+				infos.add(info);
+			}
+		}
+		return infos;
+	}
+	private void outputEntries(List<FileEntryIndex> infos) {
+		for (FileEntryIndex info: infos) {
+			System.out.println(info.stage + "|" + 
+						info.level + "|" + 
+//						info.rows + "|" + 
+//						info.cols + "|" + 
+						"moves=" + info.moves + "," + 
+						"completed=" + info.completed + "," + 
+						"turtles=" + info.turtles + "," + 
+						"floorTiles=" + info.floorTiles + "," + 
+						"rank=" + (new BigDecimal(info.rank).toPlainString())
+						);
+		}
+	}
+	
+	private void createStatisticsFile() throws Exception {
+		createStatisticsFile(1, 18000);
+	}
+	private void createStatisticsFile(int start, int end) throws Exception {
+		SokobanLevelParserHelper helper = new SokobanLevelParserHelper(true);
+		String rootDir = "C:\\Users\\Jacob\\eclipse-workspace-silver\\jaro\\sokoban-downloads\\all-collections\\stage-data\\Jaroban";
+		FileOutputStream out = new FileOutputStream(rootDir + "/statistics.txt");
+		for (int i = start; i <= end; i++) {
 			try {
 				System.out.println("Level Id: " + i);
-				new SokobanImporter().saveLevel(i);
-			} catch (Exception e) {
+				FileEntryIndex info = downloadLevelStats(i);
+				addGridInformationFromFile(info, helper, rootDir);
 				
+				if (info.invalidLevel) {
+					// this will mark it as so unpopular, that it won't get picked
+					info.completed = 0;
+					info.moves = 1000;
+					info.turtles = 100;
+				}
+				
+				System.out.println("stage=" + info.stage);
+				System.out.println("level=" + info.level);
+				System.out.println("moves=" + info.moves);
+				System.out.println("completed=" + info.completed);
+				System.out.println("floorTiles=" + info.floorTiles);
+				
+				String line = 
+						info.stage + "|" + 
+						info.level + "|" + 
+//						info.rows + "|" + 
+//						info.cols + "|" + 
+						info.moves + "|" + 
+						info.completed + "|" + 
+						info.turtles + "|" + 
+						info.floorTiles;
+					out.write(line.getBytes());
+					out.write('\n');
+					out.flush();
+			} catch (Exception e) {
+				// we're okay with this - probably wasn't a level there - but need to be careful as sometimes it's a parse error
+				System.out.println(e.getMessage());
+			}
+		}
+		out.close();
+	}
+	/**
+	 * I want to somehow indicate the "bad" mazes I found like #2838 - already in position, so technically the game is won  
+	 */
+	private void addGridInformationFromFile(FileEntryIndex info, SokobanLevelParserHelper helper, String rootDir) throws Exception {
+		// get the raw file
+		String stageDirName =  rootDir + "/" + info.stage;
+		File stageDir = new File(stageDirName);
+		for (File level: stageDir.listFiles()) {
+			String name = level.getName();
+			int pos = name.indexOf(".");
+			name = name.substring(pos + 1);
+			if (name.equals(info.level + ".txt")) {
+				FileInputStream in = new FileInputStream(level);
+				String data = Utils.toString(in);
+				List<List<String>> tokens = helper.toTokensForSplitData(data);
+				// keep track of this so we can see if this is an "illegal" game - by my own standards (we know there's at least one level like this)
+				int uncoveredDestinationsCount = 0;
+				for (List<String> row: tokens) {
+					for (String cell: row) {
+						if ("aJ".indexOf(cell) >= 0) {
+							uncoveredDestinationsCount++;
+						}
+						if ("f^v<>AV{}ajJ".indexOf(cell) >= 0) {
+							info.floorTiles++;
+						}
+						if ("^v<>AV{}".indexOf(cell) >= 0) {
+							info.turtles++;
+						}
+					}
+				}
+				if (uncoveredDestinationsCount == 0) {
+					info.invalidLevel = true;
+				}
+				info.rows = tokens.size();
+				info.cols = tokens.get(0).size();
+				break;
 			}
 		}
 	}
@@ -55,32 +211,220 @@ public class SokobanImporter {
 	// http://www.game-sokoban.com/index.php?mode=level&lid=349
 	private String baseUrl = "http://www.game-sokoban.com/index.php?mode=level&lid=";
 
-	public void createDbFromScratch() throws Exception {
-		List<FileEntryIndex> infos = getAllPopularLevels();
-		// download the files
+	/**
+	 * We have to assume the db index are already created, but that's not quite right...
+	 * @throws Exception
+	 */
+	private void createRankedIndex() throws Exception {
+		String rootDir = "C:\\Users\\Jacob\\eclipse-workspace-silver\\jaro\\sokoban-downloads\\all-collections";
+		String assetsDir = rootDir + "/" + DbResources.JARO_ASSETS_DIR;
+		
+		List<FileEntryIndex> infos = parseStatisticsFile(assetsDir + "/statistics.txt");
+		addRowAndColumn(infos, rootDir);
+		
+		// filter out all grids that are too large
+		int maxCols = 13;
+		int maxRows = 17;
+		infos = removeLargeGrids(infos, maxCols, maxRows);
+		
+		// get the list of the top 2000 most popular (so I can have twice what the other android game has)
+		Collections.sort(infos, new PopularitySorter());
+		infos = infos.subList(0, 2000);
+		
+		// determine the ranking of each collection now
+		// these will already be sorted by collection rank, and the levels in each will be sorted by assigned number
+		infos = sortByRanks(infos);
+
+		SokobanLevelParserHelper helper = new SokobanLevelParserHelper(true);
+		helper.setCompressing(true, maxCols, maxRows);
+
+		// add the file data - will need before we do the compression
+		helper.addFileData(infos, assetsDir);
+
+		// after we get the data, then rename the stages
+		createNewStages(infos);
+
+		// TEMP - ensure all info is filled in with data - it's skipping some...
 		for (FileEntryIndex info: infos) {
-			saveLevel(info.id);
+			if (info.data == null) {
+				throw new IllegalArgumentException("No Data: " + info.stage + "/" + info.level);
+			}
+		}
+		
+		// output the index and db - using this new ordering
+		helper.compressFiles(assetsDir, infos, "ranked-");
+	}
+	private class Collection {
+		String stage;
+		float minRank;
+		float maxRank;
+		List<FileEntryIndex> infos = new ArrayList<FileEntryIndex>();
+	}
+	private List<FileEntryIndex> sortByRanks(List<FileEntryIndex> infos) {
+//		IndexRankComparator comp = new IndexRankComparator();
+		TurtleCountComparator comp = new TurtleCountComparator();
+
+		Map<String, Collection> colMap = new HashMap<String, Collection>();
+		// for each (non-empty) collection, assign a ranking
+		for (FileEntryIndex info: infos) {
+			// floor tiles / moves
+			comp.assignRank(info);
+			
+			Collection col = colMap.get(info.stage);
+			if (col == null) {
+				col = new Collection();
+				col.stage = info.stage;
+				col.minRank = info.rank;
+				col.maxRank = info.rank;
+				colMap.put(col.stage, col);
+			} else {
+				if (col.minRank > info.rank) {
+					col.minRank = info.rank;
+				}
+				if (col.maxRank < info.rank) {
+					col.maxRank = info.rank;
+				}
+			}
+			col.infos.add(info);
+		}
+		
+		// output just so I can look at it
+		// this doesn't actually affect the collections (at this time, but it might later)
+		Collections.sort(infos, comp);
+		outputEntries(infos);
+		
+		/*
+		// order the collections by overlapping ranks
+		// for example 0-5, 2-6, 2-7, 3-7, etc
+		// simple algorithm is that we sort collections, first by min, then by max
+		List<Collection> cols = new ArrayList<Collection>(colMap.values());
+		Collections.sort(cols, new CollectionRankComparator());
+		
+		System.out.println(">> Collections");
+		infos = new ArrayList<FileEntryIndex>();
+		for (Collection col: cols) {
+			Collections.sort(col.infos, comp);
+			infos.addAll(col.infos);
+			System.out.println(col.stage + "|" + (new BigDecimal(col.minRank).toPlainString()) + " > " + (new BigDecimal(col.maxRank).toPlainString()));
+		}
+		
+		// TODO actually return the collections - but I wanted to create a whole new way of doing
+		*/
+		return infos;
+	}
+	/**
+	 * This overwrites existing stage/level info.
+	 */
+	private void createNewStages(List<FileEntryIndex> infos) {
+		int levelsPerStage = 10; // not sure what a good number is, but we picked 2000 levels
+		int currentCount = 0;
+		int stageNumber = 1;
+		for (FileEntryIndex info: infos) {
+			info.level = info.stage + ": " + info.level;
+			info.level = Utils.toCleanName(info.level);
+			info.stage = "Jaroban Stage " + stageNumber;
+			
+			// now's an okay time to clean up the names
+			info.level = info.level.replace("  ", " ");
+			
+			currentCount++;
+			if (currentCount == levelsPerStage) {
+				stageNumber++;
+				currentCount = 0;
+			}
+		}
+	}
+	private class CollectionRankComparator implements Comparator<Collection> {
+		@Override
+		public int compare(Collection o1, Collection o2) {
+			float diff = o2.minRank - o1.minRank;
+			if (diff < 0) {
+				return -1;
+			} else if (diff > 0) {
+				return 1;
+			}
+			diff = o2.maxRank - o1.maxRank;
+			if (diff < 0) {
+				return -1;
+			} else if (diff > 0) {
+				return 1;
+			}
+			return 0;
+		}
+	}
+	private class TurtleCountComparator extends IndexRankComparator {
+		@Override
+		public void assignRank(FileEntryIndex info) {
+			info.rank = info.moves * (10000000000f);
+			info.rank += (info.turtles * 100000);
+			info.rank += info.floorTiles;
+			info.rank = -info.rank;
+		}
+	}
+	private class IndexRankComparator implements Comparator<FileEntryIndex> {
+		@Override
+		public int compare(FileEntryIndex o1, FileEntryIndex o2) {
+			if (o1.rank < o2.rank) {
+				return 1;
+			} else if (o1.rank > o2.rank) {
+				return -1;
+			}
+			return 0;
+		}
+		public void assignRank(FileEntryIndex info) {
+			info.rank = ((float) info.floorTiles) / ((float) info.moves);
+		}
+	}
+	private List<FileEntryIndex> removeLargeGrids(List<FileEntryIndex> infos, int maxCols, int maxRows) {
+		List<FileEntryIndex> newInfos = new ArrayList<FileEntryIndex>();
+		for (FileEntryIndex info: infos) {
+			if (info.cols <= maxCols && info.rows <= maxRows) {
+				newInfos.add(info);
+			}
+		}
+		return newInfos;
+	}
+	private void createDbFromDownloadedFiles() throws Exception {
+		SokobanLevelParserHelper helper = new SokobanLevelParserHelper(true);
+		helper.setCompressing(true, -1, -1);
+		String dir = "C:\\Users\\Jacob\\eclipse-workspace-silver\\jaro\\sokoban-downloads\\all-collections\\" + DbResources.JARO_ASSETS_DIR;
+		helper.compressFiles(dir, dir);
+	}
+	private void createPopularDbFromScratch() throws Exception {
+		List<FileEntryIndex> infos = getAllPopularLevels();
+		String dir = "C:\\Users\\Jacob\\eclipse-workspace-silver\\jaro\\sokoban-downloads\\favorites";
+		for (FileEntryIndex info: infos) {
+			saveLevel(dir, info.id);
 		}
 		// create the db
 		SokobanLevelParserHelper helper = new SokobanLevelParserHelper(true);
 		helper.setCompressing(true, 13, 17);
-		helper.compressFiles(infos);
+		helper.compressFiles(dir, dir);
 	}
 	
-	public void saveLevel(int id) throws Exception {
+	private void saveLevel(String outputDir, int id) throws Exception {
 		String page = downloadPage(id);
-		toCleanFile(page);
-		// save to file
+		if (page != null) {
+			toCleanFile(outputDir, page);
+		}
 	}
 	
-	public String downloadPage(int id) throws Exception {
+	private String downloadPage(int id) throws Exception {
 		String levelUrl = baseUrl + id;
-		URLConnection con = new URL(levelUrl).openConnection();
-		InputStream in = con.getInputStream();
-		return Utils.toString(in);
+		try {
+			URLConnection con = new URL(levelUrl).openConnection();
+			InputStream in = con.getInputStream();
+			String page = Utils.toString(in);
+			if ("Page not found :(".equals(page)) {
+				return null;
+			}
+			return page;
+		} catch (IOException ioe) {
+			return null;
+		}
 	}
 	
-	public void toCleanFile(String page) throws Exception {
+	private void toCleanFile(String outputDir, String page) throws Exception {
 		// <r>20v</r><r>20v</r><r>4v,7w,9v</r><r>4v,w,5f,w,9v</r><r>3v,2w,5f,5w,5v</r><r>3v,w,5f,2w,3f,2w,4v</r><r>3v,w,3f,w,a,2w,4f,2w,3v</r><r>3v,w,3f,w,2a,6f,w,3v</r><r>3v,w,3f,3a,2w,4f,w,3v</r><r>3v,4w,2a,f,w,5f,w,3v</r><r>6v,2w,a,f,w,5f,w,3v</r><r>7v,5w,3f,2w,3v</r><r>11v,w,3f,w,4v</r><r>11v,5w,4v</r><r>20v</r>
 		String patternString = ".*comments=\"[0-9]*\">(.*?)<am>.*";
 		Pattern outerPattern = Pattern.compile(patternString);
@@ -149,6 +493,11 @@ public class SokobanImporter {
 			
 			// get the name and number
 			String cname = getAttribute("cname", page);
+			
+			// this is a special weird case, so just skip it
+			if ("".equals(cname)) {
+				return;
+			}
 			String name = getAttribute("name", page);
 			String levelNumber = getAttribute("number", page);
 			
@@ -157,10 +506,10 @@ public class SokobanImporter {
 				System.out.println(tokens);
 			}
 
-			output(gridTokens, cname, name, levelNumber);
+			output(outputDir, gridTokens, cname, name, levelNumber);
 			
 		} else {
-			throw new IllegalArgumentException("Could not parse page");
+			throw new IllegalArgumentException("Could not parse page into " + outputDir + ": " + page);
 		}
 	}
 	private void cleanGridSpace(List<List<String>> gridTokens) {
@@ -243,11 +592,10 @@ public class SokobanImporter {
 		}
 		return ttype.substring(random, random + 1);
 	}
-	private void output(List<List<String>> grid, String cname, String name, String levelNumber) throws Exception {
-		File levelsDir = new File("C:\\Users\\Jacob\\eclipse-workspace-silver\\jaro\\sokoban-downloads\\favorites");
-		cname = cname.replace(' ', '_');
-		name = name.replace(' ', '_');
-		name = name.replace('?', '_');
+	private void output(String outputDir, List<List<String>> grid, String cname, String name, String levelNumber) throws Exception {
+		File levelsDir = new File(outputDir);
+		cname = Utils.toCleanName(cname);
+		name = Utils.toCleanName(name);
 		File cnameDir = new File(levelsDir, cname);
 		cnameDir.mkdirs();
 		
@@ -255,7 +603,7 @@ public class SokobanImporter {
 			levelNumber = "0" + levelNumber;
 		}
 		
-		File file = new File(cnameDir, "l_" + levelNumber + "." + name + ".txt");
+		File file = new File(cnameDir, levelNumber + "." + name + ".txt");
 		FileOutputStream out = new FileOutputStream(file);
 		PrintWriter writer = new PrintWriter(out);
 		for (List<String> row: grid) {
@@ -294,7 +642,7 @@ public class SokobanImporter {
 		buf.append(tokens.charAt(0));
 	}
 	private String getAttribute(String name, String page) {
-		Pattern p = Pattern.compile("<l\\s+.*?\\s" + name + "=\"(.+?)\"");
+		Pattern p = Pattern.compile("<l\\s+.*?\\s" + name + "=\"(.*?)\"");
 		Matcher m = p.matcher(page);
 		if (m.find()) {
 			return m.group(1);
@@ -321,7 +669,7 @@ public class SokobanImporter {
 		
 		return points;
 	}
-	public List<String> rowToTokens(String row) {
+	private List<String> rowToTokens(String row) {
 		List<String> tokens = new ArrayList<String>();
 		// 4v,7w,9v
 		// <td><img src="http://jacobrobertson.com/jaro/drawable/boulder.png" /></td>
@@ -360,7 +708,7 @@ public class SokobanImporter {
 </div>
 
  	*/
-	public List<FileEntryIndex> getAllPopularLevels() throws Exception {
+	private List<FileEntryIndex> getAllPopularLevels() throws Exception {
 		List<FileEntryIndex> infos = new ArrayList<FileEntryIndex>();
 		Pattern pattern = Pattern.compile(
 				"popular_item_.\" width=\"[0-9]+\" src=\"./pics/thumb_([0-9]+).gif" +
@@ -389,4 +737,119 @@ public class SokobanImporter {
 		return infos;
 	}
 	
+	private FileEntryIndex downloadLevelStats(int level) throws Exception {
+		
+		FileEntryIndex info = new FileEntryIndex();
+		
+		String url = "http://www.game-sokoban.com/index.php?mode=best&lid=" + level;
+		
+		info.completed = 0;
+		info.moves = 0;
+		
+		Pattern p = Pattern.compile("class=\"result-cell1\">([0-9]+)</td>");
+		// very first instance of this is what I want
+		// but I also want to count them
+		// class="result-cell1">59</td>
+		
+		// not sure about this - I wanted the average to fix a bug in the moves required,
+		// but the bug is a bigger issue, because my rules for solving a level are different - you aren't required to make at least one move
+		// however, doing an average isn't really all that bad anyways
+		int numToAverage = 10;
+		int totalMoves = 0;
+		int numAveraged = 0;
+		String data = download(url);
+		Matcher m = p.matcher(data);
+		while (m.find()) {
+			info.completed++;
+			numAveraged++;
+			if (numAveraged <= numToAverage) {
+				String num = m.group(1);
+				int moves = Integer.parseInt(num);
+				totalMoves += moves;
+				info.moves = (totalMoves / numAveraged);
+			}
+		}
+		
+		// <a href="index.php?mode=catalog&amp;cid=4">aenigma</a> &#0187; <a href="index.php?mode=level&amp;lid=5004">soko 14</a>
+		p = Pattern.compile("cid=[0-9]+\">(.*?)</a");
+		m = p.matcher(data);
+		if (!m.find()) {
+			throw new IllegalArgumentException("No collection for: " + level);
+		}
+		info.stage = Utils.toCleanName(m.group(1));
+		
+		p = Pattern.compile("lid=" + level + "\">(\\w.*?)</a");
+		m = p.matcher(data);
+		if (!m.find()) {
+			throw new IllegalArgumentException("No levelName for: " + level);
+		}
+		info.level = Utils.toCleanName(m.group(1));
+		info.id = level;
+		
+		return info;
+	}
+	private String download(String url) throws IOException {
+		int timeout = 1000;
+		int tries = 100;
+		int sleep = 500;
+		for (int i = 0; i < tries; i++) {
+			try {
+				URLConnection con = new URL(url).openConnection();
+				con.setConnectTimeout(timeout);
+				InputStream in = con.getInputStream();
+				String page = Utils.toString(in);
+				return page;
+			} catch (Exception e) {
+				e.printStackTrace();
+				try {
+					Thread.sleep(sleep);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+			}
+		}
+		return null;
+	}
+	
 }
+/*
+
+what is the right formula to determine the difficulty of a level?
+- area, or maybe number of floor blocks
+- number of moves
+
+So, floor/moves, and the larger the number, the easier the level
+
+then, how does popularity play in?  Just because it's easy doesn't mean it's good
+- already added popularity by doing top X levels
+- however, i treated all collections equally.  better way would have been to find top X levels regardless of what catalog
+- So, I could go through every single level, and then simply take the top 500 or 1000 (becuase I've shrunk the database so much, I could do that) in terms of popularity
+
+But how do I organize the levels?
+- I want to reorganize them and sort them by difficulty, but in theory that's already been done
+- I also think I want to redo the max size of the mazes - they're still pretty big.????
+- So, probably instead of sorting collections alphabetically, sort them by difficulty
+
+
+New ideas for ranking things
+what do we have to work with?
+- floor
+- turtles
+- moves
+- popularity
+
+Ideas
+- rank it as follows
+--- number of turtles
+--- floor space
+- Make completely new collections
+-- name it simply "1 Turtle", "2 Turtles", etc...
+-- name levels "collection: level name"
+-- this idea would cause me to need to update the code for compression, or probably easier would be to copy files over to new names
+
+- popularity ideas
+--- we still want 2000 levels
+--- but delete any collection that has fewer than (5) 
+--- then optionally grab some more levels after that, to make up for it
+
+*/

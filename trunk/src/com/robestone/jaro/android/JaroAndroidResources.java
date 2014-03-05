@@ -8,6 +8,7 @@ import java.util.Map;
 import com.robestone.jaro.levels.JaroResources;
 import com.robestone.jaro.levels.Level;
 import com.robestone.jaro.levels.Stage;
+import com.robestone.jaro.levels.Utils;
 
 /**
  * Central class for performing all I/O of levels and stages.
@@ -99,9 +100,12 @@ public abstract class JaroAndroidResources implements JaroResources {
 		return k;
 	}
 	static String cleanName(String fileName) {
-		int pos = fileName.indexOf('.');
-		String caption = fileName.substring(pos + 1);
-		caption = caption.replace('_', ' ');
+		String caption = fileName;
+		int pos = caption.indexOf('.');
+		if (pos > 0) {
+			caption = caption.substring(pos + 1);
+		}
+		caption = Utils.parseName(caption);
 		return caption;
 	}
 

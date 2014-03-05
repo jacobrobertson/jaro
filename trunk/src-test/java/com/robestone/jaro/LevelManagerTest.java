@@ -8,6 +8,7 @@ import com.robestone.jaro.android.HtmlResources;
 import com.robestone.jaro.levels.JaroResources;
 import com.robestone.jaro.levels.Level;
 import com.robestone.jaro.levels.LevelManager;
+import com.robestone.jaro.levels.Stage;
 
 public class LevelManagerTest extends TestCase {
 
@@ -75,6 +76,57 @@ public class LevelManagerTest extends TestCase {
 		Grid grid = resources.getGrid(level);
 		List<Piece> pieces = grid.getPieces(4, 5);
 		assertEquals(2, pieces.size());
+	}
+	
+	public void testUnlockedBehavior() {
+		JaroResources resources = new HtmlResources(new JaroFileAssets("src-test/resources"));
+		JaroGame game = new JaroGame(new JaroModel(resources), new JaroView(), new JaroController(), new LevelPersisterMock(), resources);
+		LevelManager levelManager = game.getModel().getLevelManager();
+		
+		Level l1_1 = levelManager.getLevel("001.bb-1.html");
+		Level l1_2 = levelManager.getLevel("002.bb-2.html");
+		Level l1_3 = levelManager.getLevel("003.bb-3.html");
+		Level l1_4 = levelManager.getLevel("004.test-level-1.html");
+		Level l2_1 = levelManager.getLevel("001.spider-level1.html");
+		
+		assertTrue(levelManager.isLevelUnlocked(l1_1));
+		assertFalse(levelManager.isLevelPassed(l1_1));
+
+		assertFalse(levelManager.isLevelUnlocked(l1_2));
+		assertFalse(levelManager.isLevelPassed(l1_2));
+
+		Stage s1 = resources.getStage(0);
+		assertTrue(levelManager.isStageUnlocked(s1));
+		assertFalse(levelManager.isStageWorkedOn(s1));
+		assertFalse(levelManager.isStagePassed(s1));
+
+		Stage s2 = resources.getStage(1);
+		assertFalse(levelManager.isStageUnlocked(s2));
+		assertFalse(levelManager.isStageWorkedOn(s2));
+		assertFalse(levelManager.isStagePassed(s2));
+		
+		levelManager.setCurrentLevel(l1_1);
+		levelManager.passCurrentLevel();
+		assertTrue(levelManager.isLevelPassed(l1_1));
+
+		assertTrue(levelManager.isStageWorkedOn(s1));
+		assertFalse(levelManager.isStagePassed(s1));
+		assertFalse(levelManager.isStageWorkedOn(s2));
+		assertFalse(levelManager.isStageUnlocked(s2));
+		
+		assertFalse(levelManager.isLevelUnlocked(l2_1));
+		levelManager.setCurrentLevel(l1_2);
+		levelManager.passCurrentLevel();
+		assertFalse(levelManager.isLevelUnlocked(l2_1));
+		assertFalse(levelManager.isStageUnlocked(s2));
+		levelManager.setCurrentLevel(l1_3);
+		levelManager.passCurrentLevel();
+		assertTrue(levelManager.isStageUnlocked(s2));
+		assertTrue(levelManager.isLevelUnlocked(l2_1));
+		
+		levelManager.setCurrentLevel(l1_4);
+		levelManager.passCurrentLevel();
+		assertTrue(levelManager.isStagePassed(s1));
 	}
 	
 }
