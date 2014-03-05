@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animation-list xmlns:android="http://schemas.android.com/apk/res/android"
+	android:oneshot="false"
+	android:antialias="true"
+	>
+	<item android:drawable="@drawable/turtlestubborn_up1" android:duration="2431" />
+	<item android:drawable="@drawable/turtlestubborn_up2" android:duration="422" />
+	<item android:drawable="@drawable/turtlestubborn_up1" android:duration="2502" />
+	<item android:drawable="@drawable/turtlestubborn_up2" android:duration="505" />
+</animation-list>
