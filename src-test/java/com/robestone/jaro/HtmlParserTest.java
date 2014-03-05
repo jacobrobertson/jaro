@@ -15,7 +15,7 @@ public class HtmlParserTest extends TestCase {
 		doSmokeTestParse(file.getName(), file);
 	}
 	public void testParse() throws Exception {
-		File dir = new File("res/raw");
+		File dir = new File("assets/stage-data/Jaro/001.Bugs and Bushes");
 		for (File file: dir.listFiles()) {
 			if (file.getName().endsWith(".html")) {
 				doSmokeTestParse(file.getName(), file);

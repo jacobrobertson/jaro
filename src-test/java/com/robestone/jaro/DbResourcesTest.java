@@ -10,8 +10,10 @@ import com.robestone.jaro.levels.Level;
 
 public class DbResourcesTest extends TestCase {
 
+	private static final String ASSETS_DIR = "src-test/resources/DbResourcesTest";
+	
 	public void testParseStages() throws IOException {
-		JaroAssets assets = new JaroFileAssets("assets");
+		JaroAssets assets = new JaroFileAssets(ASSETS_DIR);
 		DbResources resources = new DbResources(assets);
 		
 		assertEquals("Alberto", resources.getStage(1).getStageKey());
@@ -31,7 +33,7 @@ sokoboxes_plus_04:14:12
 	}
 	// 2_8w2_2w2f
 	public void testParseGrid() throws Exception {
-		JaroAssets assets = new JaroFileAssets("assets");
+		JaroAssets assets = new JaroFileAssets(ASSETS_DIR);
 		DbResources resources = new DbResources(assets);
 		Level level = resources.getLevel("Sasquatch__V", 3);
 		String gs = resources.getGridString(level);

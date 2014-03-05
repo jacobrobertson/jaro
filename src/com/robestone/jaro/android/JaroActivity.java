@@ -51,18 +51,6 @@ public class JaroActivity extends Activity {
 			}
 		}
 	}
-	/**
-	 * TODO could make this a preference, etc.
-	 */
-	private boolean isShowAllLevels() {
-		JaroPreferences prefs = new JaroPreferences(this);
-		String gameType = prefs.getGameType();
-		if (HtmlResources.JARO_GAME_TYPE.equals(gameType)) {
-			return false;
-		} else {
-			return true;
-		}
-	}
 	private void createGame() {
 		JaroAssets assets = new JaroAndroidAssets(getAssets());
 		JaroPreferences prefs = new JaroPreferences(this);
@@ -192,35 +180,20 @@ public class JaroActivity extends Activity {
 		// build the captions for all unlocked stages
     	List<String> stageCaptions = new ArrayList<String>();
     	Stage stage1 = null;
-		boolean showAll = isShowAllLevels();
 		LevelManager levelManager = game.getModel().getLevelManager();
+		boolean showAll = levelManager.isShowAllLevels();
     	for (Stage stage: game.getJaroResources().getStages()) {
     		if (stage1 == null) {
     			stage1 = stage;
     		}
-    		String stageKey = stage.getStageKey();
-    		boolean stagePassed = true;
-    		boolean anyLevelPassed = false;
-    		boolean stageUnlocked = showAll;
-    		
-    		// determine if stage is completely passed or not
-    		for (Level level: resources.getLevels(stageKey)) {
-    			stageUnlocked = stageUnlocked || levelManager.isLevelUnlocked(level);
-    			boolean levelPassed = levelManager.isLevelPassed(level);
-    			stagePassed = stagePassed && levelPassed;
-    			anyLevelPassed = anyLevelPassed || levelPassed;
-    		}
-    		
-    		// TODO I want to make a better algorithm than this.  for example, if you pass
-    		//		a certain percent of a stage, it unlocks the next stage
-    		//		also, it should show the stages greyed out rather than just not showing up
+    		boolean stageUnlocked = showAll || levelManager.isStageUnlocked(stage);
     		if (!stageUnlocked) {
     			break;
     		}
     		String caption = stage.getCaption();
-    		if (stagePassed) {
+    		if (levelManager.isStagePassed(stage)) {
     			caption = "* " + caption;
-    		} else if (anyLevelPassed) {
+    		} else if (levelManager.isStageWorkedOn(stage)) {
     			caption = "+ " + caption;
     		}
        		stageCaptions.add(caption);
@@ -235,7 +208,7 @@ public class JaroActivity extends Activity {
     		String title = getString(R.string.pick_a_stage);
     		int stagesCount = resources.getStagesCount();
     		if (stageCaptions.size() < stagesCount) {
-    			title = title + " (" + stageCaptions.size() + "/" + stagesCount + " " + getString(R.string.unlocked)+ ")";
+    			title = title + "\n(" + stageCaptions.size() + "/" + stagesCount + " " + getString(R.string.unlocked)+ ")";
     		}
         	builder.setTitle(title);
 	    	String[] items = new String[stageCaptions.size()];
@@ -258,7 +231,8 @@ public class JaroActivity extends Activity {
 		final JaroResources resources = game.getJaroResources();
     	List<String> levelCaptions = new ArrayList<String>();
     	int size = resources.getLevelsCount(stage.getStageKey());
-		boolean showAll = isShowAllLevels();
+		LevelManager levelManager = game.getModel().getLevelManager();
+		boolean showAll = levelManager.isShowAllLevels();
 		for (int i = 0; i < size; i++) {
     		Level level = resources.getLevel(stage.getStageKey(), i);
     		boolean unlocked = showAll || game.getModel().getLevelManager().isLevelUnlocked(level);
@@ -274,7 +248,7 @@ public class JaroActivity extends Activity {
 
 		String title = stage.getCaption();
 		if (levelCaptions.size() < size) {
-			title = title + " (" + levelCaptions.size() + "/" + size + " " + getString(R.string.unlocked)+ ")";
+			title = title + "\n(" + levelCaptions.size() + "/" + size + " " + getString(R.string.unlocked)+ ")";
 		}
     	builder.setTitle(title);
 
@@ -302,7 +276,7 @@ public class JaroActivity extends Activity {
     	builder.setTitle(R.string.level_passed);
     	String caption = game.getModel().getLevelManager().getNextLevel().getCaption();
     	String[] items = {
-    			getString(R.string.next_up) + " " + caption, 
+    			getString(R.string.next_up) + "\n" + caption, 
     			};
     	builder.setItems(items, new DialogInterface.OnClickListener() {
     	    public void onClick(DialogInterface dialog, int item) {

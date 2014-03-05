@@ -16,9 +16,11 @@ import com.robestone.jaro.Piece;
 import com.robestone.jaro.piecerules.JaroPieceRules;
 
 /**
- * TODO there are too many sokoban parse classes - need to merge, or reorganize
+ * TODO there are too many sokoban parse classes - need to merge, or reorganize.
+ * SokobanImporter
+ * DbResources
+ * SokobanLevelParserHelper
  * @author Jacob
- *
  */
 public class SokobanLevelParserHelper {
 
@@ -360,6 +362,16 @@ public class SokobanLevelParserHelper {
 
 		public int id;
 		public int completed;
+		public int moves;
+		
+		// includes anything you can walk through
+		public int floorTiles;
+		public int turtles;
+		
+		public float rank;
+		
+		// special flag possibly used by different checks
+		public boolean invalidLevel = false;
 	}
 	/**
 	 * Create one master file with the following format
@@ -384,30 +396,69 @@ public class SokobanLevelParserHelper {
 		w2fa}aja{a6fw
 		w2f3wa3w2fw3fw
 	 */
-	public void compressFiles(List<FileEntryIndex> existingInfo) throws Exception {
+	public List<FileEntryIndex> getFilesInfo(String stagesDir) throws Exception {
 		
 		// get the index information from the files
-		// need to merge that with existingInfo
 		List<FileEntryIndex> indexes = new ArrayList<FileEntryIndex>();
-		File dir = new File("C:\\Users\\Jacob\\eclipse-workspace-silver\\jaro\\sokoban-downloads\\favorites");
+		File dir = new File(stagesDir);
 		File[] stages = dir.listFiles();
 		for (File stage: stages) {
-			File[] levels = stage.listFiles();
-			for (File level: levels) {
-				FileEntryIndex index = compressFile(level);
-				if (index != null) {
-					indexes.add(index);
+			// skip any non-dirs - those are either index or db, or other metadata
+			if (stage.isDirectory()) {
+				File[] levels = stage.listFiles();
+				for (File level: levels) {
+					FileEntryIndex index = compressFile(level);
+					if (index != null) {
+						indexes.add(index);
+					}
 				}
 			}
 		}
 		
-		// figure out which stages are easiest, and sort that way
+		return indexes;
+	}
+	public void addFileData(List<FileEntryIndex> indexes, String stagesDir) throws Exception {
 		
+		// build a map of indexes, otherwise we'll have n * m time on this, and making a map will make it n * 2
+		Map<String, FileEntryIndex> map = new HashMap<String, FileEntryIndex>();
+		for (FileEntryIndex info: indexes) {
+			map.put(info.stage + "/" + info.level, info);
+		}
 		
+		// get the index information from the files
+		File dir = new File(stagesDir);
+		File[] stages = dir.listFiles();
+		for (File stage: stages) {
+			// skip any non-dirs - those are either index or db, or other metadata
+			if (stage.isDirectory()) {
+				File[] levels = stage.listFiles();
+				for (File level: levels) {
+					FileEntryIndex index = compressFile(level);
+					if (index != null) {
+						FileEntryIndex mapIndex = map.get(index.stage + "/" + index.level);
+						if (mapIndex != null) {
+							mapIndex.data = index.data;
+						} else {
+//							System.out.println("Skipping " + index.stage + "/" + index.level);
+						}
+					}
+				}
+			}
+		}
+	}
+	public void compressFiles(String stagesDir, String dbDir) throws Exception {
+		// get the index information from the files
+		List<FileEntryIndex> indexes = getFilesInfo(stagesDir);
+		compressFiles(dbDir, indexes);
+	}
+	public void compressFiles(String dbDir, List<FileEntryIndex> indexes) throws Exception {
+		compressFiles(dbDir, indexes, "");
+	}
+	public void compressFiles(String dbDir, List<FileEntryIndex> indexes, String filePrefix) throws Exception {
 		// output
-		File dbFile = new File("C:\\Users\\Jacob\\eclipse-workspace-silver\\jaro\\sokoban-downloads\\db.txt");
-		File indexFile = new File("C:\\Users\\Jacob\\eclipse-workspace-silver\\jaro\\sokoban-downloads\\index.txt");
-//		FileOutputStream out = new FileOutputStream(compressed);
+		File dbDirFile = new File(dbDir);
+		File dbFile = new File(dbDirFile, filePrefix + "db.txt");
+		File indexFile = new File(dbDirFile, filePrefix + "index.txt");
 		FileWriter dbWriter = new FileWriter(dbFile);
 		FileWriter indexWriter = new FileWriter(indexFile);
 		String lastStage = null;
@@ -443,7 +494,7 @@ public class SokobanLevelParserHelper {
 	 * 	C:\Users\Jacob\eclipse-workspace-silver\jaro\parsed-sokoban\levels\s_006.Jaro-ban (10,000 Levels)\aenigma\l_001.soko_01.txt
 	 * s_NUM.Jaro-ban (10,000 Levels)\SUBSTAGE\1_NUM.NAME_NAME.txt
 	 */
-	private Pattern fileNamePattern = Pattern.compile(".*/(.*)/l_[0-9]+\\.(.*)\\.txt");
+	private Pattern fileNamePattern = Pattern.compile(".*/(.*)/[0-9]+\\.(.*)\\.txt");
 	public FileEntryIndex compressFile(File file) throws Exception {
 		FileEntryIndex index = new FileEntryIndex();
 		// data in "old" format
@@ -497,4 +548,5 @@ public class SokobanLevelParserHelper {
 		this.maxColsToImport = maxColsToImport;
 		this.maxRowsToImport = maxRowsToImport;
 	}
+
 }
