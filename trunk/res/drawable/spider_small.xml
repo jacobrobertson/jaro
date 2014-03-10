@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animation-list xmlns:android="http://schemas.android.com/apk/res/android"
+	android:oneshot="false"
+	android:antialias="true"
+	>
+	<item android:drawable="@drawable/spider_small1" android:duration="500" />
+	<item android:drawable="@drawable/spider_small2" android:duration="200" />
+	<item android:drawable="@drawable/spider_small3" android:duration="300" />
+	<item android:drawable="@drawable/spider_small4" android:duration="100" />
+	<item android:drawable="@drawable/spider_small5" android:duration="100" />
+	<item android:drawable="@drawable/spider_small6" android:duration="300" />
+	<item android:drawable="@drawable/spider_small7" android:duration="150" />
+	<item android:drawable="@drawable/spider_small8" android:duration="100" />
+	<item android:drawable="@drawable/spider_small9" android:duration="100" />
+	<item android:drawable="@drawable/spider_small8" android:duration="50" />
+	<item android:drawable="@drawable/spider_small9" android:duration="75" />
+	<item android:drawable="@drawable/spider_small8" android:duration="100" />
+	<item android:drawable="@drawable/spider_small7" android:duration="150" />
+	<item android:drawable="@drawable/spider_small6" android:duration="300" />
+	<item android:drawable="@drawable/spider_small5" android:duration="100" />
+	<item android:drawable="@drawable/spider_small4" android:duration="500" />
+	<item android:drawable="@drawable/spider_small3" android:duration="300" />
+	<item android:drawable="@drawable/spider_small2" android:duration="200" />
+</animation-list>
