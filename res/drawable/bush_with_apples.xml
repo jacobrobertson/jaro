@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animation-list xmlns:android="http://schemas.android.com/apk/res/android"
+	android:oneshot="false"
+	android:antialias="true"
+	>
+	<item android:drawable="@drawable/bush_with_apples1" android:duration="3050" />
+	<item android:drawable="@drawable/bush_with_apples2" android:duration="2550" />
+</animation-list>
