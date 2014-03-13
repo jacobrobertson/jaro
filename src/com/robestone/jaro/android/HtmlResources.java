@@ -134,6 +134,7 @@ public class HtmlResources extends JaroAndroidResources {
 		int pos = htmlData.indexOf("<tr>");
 		int pos2 = htmlData.indexOf("</tr>");
 		String sub = htmlData.substring(pos, pos2);
+		pos = 1;
 		while (pos >= 0) {
 			pos = sub.indexOf("<td>", pos + 1);
 			cols++;

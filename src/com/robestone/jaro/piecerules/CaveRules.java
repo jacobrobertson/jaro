@@ -82,8 +82,8 @@ public class CaveRules extends PieceRulesAdapter {
 		map.addMatch(CAVE_TYPE_ID, cave_solid, cave_solid, cave_solid);
 		
 		map.addMatch(CAVE_TYPE_ID, cave_t_bottom, cave_t_bottom, cave_t_right);
-		map.addMatch(CAVE_TYPE_ID, cave_t_left, cave_t_left, cave_t_bottom);
-		map.addMatch(CAVE_TYPE_ID, cave_t_right, cave_t_right, cave_t_top);
+		map.addMatch(CAVE_TYPE_ID, cave_t_left, cave_t_left, cave_t_top);
+		map.addMatch(CAVE_TYPE_ID, cave_t_right, cave_t_right, cave_t_bottom);
 		map.addMatch(CAVE_TYPE_ID, cave_t_top, cave_t_top, cave_t_left);
 		map.addMatch(CAVE_TYPE_ID, cave_t_center, cave_t_center, cave_t_center);
 

@@ -51,6 +51,8 @@ public class Utils {
 				}
 			} else if (c == '[') {
 				counting = true;
+			} else if (c == '_') {
+				buf.append(' ');
 			} else {
 				buf.append(c);
 			}

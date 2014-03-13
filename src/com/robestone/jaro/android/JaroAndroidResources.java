@@ -24,8 +24,7 @@ public abstract class JaroAndroidResources implements JaroResources {
 	private Map<String, Integer> ids = new HashMap<String, Integer>();
 	
 	private List<Stage> stages;
-	private List<Level> currentLevels;
-	private String currentStage;
+	private Map<String, List<Level>> levels = new HashMap<String, List<Level>>();
 
 	@Override
 	public final Iterable<Stage> getStages() {
@@ -54,11 +53,12 @@ public abstract class JaroAndroidResources implements JaroResources {
 		return getLevelsList(stageKey);
 	}
 	private List<Level> getLevelsList(String stageKey) {
-		if (!stageKey.equals(currentStage)) {
-			currentLevels = doGetLevels(stageKey);
-			currentStage = stageKey;
+		List<Level> list = levels.get(stageKey);
+		if (list == null) {
+			list = doGetLevels(stageKey);
+			levels.put(stageKey, list);
 		}
-		return currentLevels;
+		return list;
 	}
 	abstract List<Level> doGetLevels(String stageKey);
 

@@ -32,9 +32,13 @@ public class SpiderRules extends EatableRules {
 			return actions;
 		}
 
-		// get all empty bushes - if there are any, then we're done
+		// get all empty or apple bushes - if there are any, then we're done
 		List<Piece> emptyBushes = grid.getPiecesWithState(BushRules.BUSH_TYPE_ID, BushRules.BUSH_EMPTY_STATE);
 		if (!emptyBushes.isEmpty()) {
+			return actions;
+		}
+		List<Piece> appleBushes = grid.getPiecesWithState(BushRules.BUSH_TYPE_ID, BushRules.BUSH_WITH_APPLES_STATE);
+		if (!appleBushes.isEmpty()) {
 			return actions;
 		}
 		
@@ -45,14 +49,15 @@ public class SpiderRules extends EatableRules {
 			return actions;
 		}
 		
+		// ---- removing this behavior for consistency with other rules
 		// look at each closed bush, and if jaro is standing on one, then we're done
 		// -- this is because we don't scare the spiders until we step off the bush
-		List<Piece> jaroPieces = grid.getPieces(model.getJaroColumn(), model.getJaroRow());
-		for (Piece b: birdBushes) {
-			if (jaroPieces.contains(b)) {
-				return actions;
-			}
-		}
+//		List<Piece> jaroPieces = grid.getPieces(model.getJaroColumn(), model.getJaroRow());
+//		for (Piece b: birdBushes) {
+//			if (jaroPieces.contains(b)) {
+//				return actions;
+//			}
+//		}
 		
 		// this is it!  create the actions
 		for (Piece p: spiders) {

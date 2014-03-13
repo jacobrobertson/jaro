@@ -16,7 +16,8 @@ public class JaroAndroidView extends JaroView {
 	public JaroAndroidView(JaroActivity activity) {
 		this.activity = activity;
 		Drawable d = activity.getResources().getDrawable(R.drawable.background);
-		this.maxCellLen = d.getMinimumHeight();
+		// TODO need the right way to determine this - for now, it's scaling fine, but I'm not positive it's choosing the best image
+		this.maxCellLen = 96;// (this is from the xhdpi)//  d.getMinimumHeight() * 5; // TODO this is the problem???? not sure.
 	}
 	public void setGridView(GridView gridView) {
 		this.gridView = gridView;
