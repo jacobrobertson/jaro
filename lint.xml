@@ -1,3 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <lint>
+    <issue id="DefaultLocale" severity="ignore" />
+    <issue id="WrongCall">
+        <ignore path="src/com/robestone/jaro/android/SpriteAnimationThread.java" />
+    </issue>
 </lint>
