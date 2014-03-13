@@ -21,5 +21,5 @@
     <string name="pick_a_stage">Pick a Stage</string>
     <string name="choose_game">Choose Game</string>
     <string name="unlocked">unlocked</string>
-    <string name="next_up">Next Up ...</string>
+    <string name="next_up">Your next quest...</string>
 </resources>
