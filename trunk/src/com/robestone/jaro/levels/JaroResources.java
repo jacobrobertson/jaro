@@ -9,8 +9,6 @@ import com.robestone.jaro.Grid;
  */
 public interface JaroResources {
 
-//	String getGameType();
-	
 	Iterable<Stage> getStages();
 	
 	int getStagesCount();

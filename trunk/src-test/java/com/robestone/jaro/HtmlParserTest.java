@@ -12,17 +12,21 @@ public class HtmlParserTest extends TestCase {
 
 	public void testParse1() throws Exception {
 		File file = new File("src-test/resources/bugs_soko_html.html");
-		doSmokeTestParse(file.getName(), file);
+		doSmokeTestParse(file);
 	}
 	public void testParse() throws Exception {
-		File dir = new File("assets/stage-data/Jaro/001.Bugs and Bushes");
+		File dir = new File("assets/stage-data/Jaro/010.Bushes");
 		for (File file: dir.listFiles()) {
 			if (file.getName().endsWith(".html")) {
-				doSmokeTestParse(file.getName(), file);
+				doSmokeTestParse(file);
 			}
 		}
 	}
-	private void doSmokeTestParse(String fileName, File file) throws Exception {
+	public void testParse3() throws Exception {
+		File file = new File("assets/stage-data/Jaro/010.Bushes/050.Forest Trail.html");
+		doSmokeTestParse(file);
+	}
+	private Grid doSmokeTestParse(File file) throws Exception {
 		StringBuilder buf = new StringBuilder();
 		FileInputStream in = new FileInputStream(file);
 		int r;
@@ -35,6 +39,7 @@ public class HtmlParserTest extends TestCase {
 		Grid g = parser.parseGrid(buf.toString(), null);
 		System.out.println(file);
 		SokobanParserTest.outputGrid(g);
+		return g;
 	}
 	
 }

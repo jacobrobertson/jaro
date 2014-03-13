@@ -3,11 +3,13 @@ package com.robestone.jaro.android;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -182,6 +184,8 @@ public class JaroActivity extends Activity {
     	Stage stage1 = null;
 		LevelManager levelManager = game.getModel().getLevelManager();
 		boolean showAll = levelManager.isShowAllLevels();
+		
+		// TODO push as much logic into LevelManager - "getUnlockedStages" is a starting point 
     	for (Stage stage: game.getJaroResources().getStages()) {
     		if (stage1 == null) {
     			stage1 = stage;
@@ -271,15 +275,35 @@ public class JaroActivity extends Activity {
     	game.getView().zoomIn();
     	return true;
     }
+	@SuppressLint("NewApi")
 	public void showLevelAdvanceMenu() {
+		// we need to give the menu a brief pause for the visual element
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+		}
+		
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-    	builder.setTitle(R.string.level_passed);
-    	String caption = game.getModel().getLevelManager().getNextLevel().getCaption();
-    	String[] items = {
-    			getString(R.string.next_up) + "\n" + caption, 
-    			};
+    	builder.setTitle(getString(R.string.level_passed) + "\n" + getString(R.string.next_up));
+    	Level nextLevel = game.getModel().getLevelManager().getNextLevel();
+    	String levelCaption = nextLevel.getCaption();
+    	
+    	/* TODO add this back - but there's a serious performance issue in the way the DbResources is working
+    	final List<Stage> unlockedStages = game.getModel().getLevelManager().getOtherUnlockedStages(nextLevel.getStageKey());
+    	
+    	String[] items = new String[unlockedStages.size() + 1];
+    	int i = 0;
+    	items[i++] = levelCaption;
+    	for (Stage stage: unlockedStages) {
+    		items[i++] = stage.getCaption();
+    	}
+    	*/
+    	String[] items = { levelCaption };
     	builder.setItems(items, new DialogInterface.OnClickListener() {
     	    public void onClick(DialogInterface dialog, int item) {
+//    	    	if (item > 0) {
+//    	    		showChooseLevelMenu(unlockedStages.get(item - 1));
+//    	    	}
     	    	passLevelMenuDone();
     	    }
     	});
@@ -289,6 +313,17 @@ public class JaroActivity extends Activity {
 				passLevelMenuDone();
 			}
 		});
+    	try {
+	    	builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+				@Override
+				public void onDismiss(DialogInterface dialog) {
+					passLevelMenuDone();
+				}
+			});
+    	} catch (Throwable t) {
+    		// this might throw if API is not compatible
+    		Log.i("JaroActivity", "showLevelAdvanceMenu.t");
+    	}
     	AlertDialog dialog = builder.create();
     	dialog.show();
 	}

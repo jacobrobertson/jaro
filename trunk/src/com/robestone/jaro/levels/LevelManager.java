@@ -1,7 +1,7 @@
 package com.robestone.jaro.levels;
 
-import com.robestone.jaro.android.HtmlResources;
-
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Responsibilities (of this package)
@@ -19,6 +19,7 @@ import com.robestone.jaro.android.HtmlResources;
 public class LevelManager {
 
 	private static final float PERCENT_TO_UNLOCK_NEXT = .7f;
+	private static final boolean SHOW_ALL_LEVELS = true;
 	
 	private LevelPersister levelPersister;
 	private JaroResources jaroResources;
@@ -164,7 +165,6 @@ public class LevelManager {
 		}
 		return passed / total;
 	}
-	private static final boolean SHOW_ALL_LEVELS = false;
 	public boolean isShowAllLevels() {
 		return SHOW_ALL_LEVELS;
 	}
@@ -172,6 +172,17 @@ public class LevelManager {
 		Stage s = jaroResources.getStage(0);
 		Level l = jaroResources.getLevel(s.getStageKey(), 0);
 		return l;
+	}
+	public List<Stage> getOtherUnlockedStages(String stageKey) {
+		List<Stage> unlocked = new ArrayList<Stage>();
+		for (Stage stage: jaroResources.getStages()) {
+			if (!stageKey.equals(stage.getStageKey()) &&
+					isStageUnlocked(stage) && 
+					!isStagePassed(stage)) {
+				unlocked.add(stage);
+			}
+		}
+		return unlocked;
 	}
 	public Level getCurrentLevel() {
 		String levelKey = levelPersister.getCurrentLevel();

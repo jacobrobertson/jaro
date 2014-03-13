@@ -11,6 +11,7 @@ public class BushRules extends PieceRulesAdapter {
 	public static final String BUSH_TYPE_ID = "bush";
 	public static final String BUSH_EMPTY_STATE = "bush_empty";
 	public static final String BUSH_WITH_BIRD_STATE = "bush_with_bird";
+	public static final String BUSH_WITH_APPLES_STATE = "bush_with_apples";
 	
 	public BushRules() {
 		super(BUSH_TYPE_ID);
@@ -21,16 +22,24 @@ public class BushRules extends PieceRulesAdapter {
 	public List<Action> getTriggeredActions(Action userAction, JaroModel model) {
 		Piece bush = getJaroStandingOn(model, BUSH_TYPE_ID);
 		if (bush != null && BUSH_EMPTY_STATE.equals(bush.getState())) {
-			Action a = new Action(bush, BUSH_WITH_BIRD_STATE);
-			return a.toList();
+			return new Action(bush, BUSH_WITH_BIRD_STATE).toList();
+		}
+		bush = model.getGrid().getPiece(userAction.getFromX(), userAction.getFromY());
+		if (bush != null && BUSH_WITH_APPLES_STATE.equals(bush.getState())) {
+			return new Action(bush, BUSH_EMPTY_STATE).toList();
 		}
 		return null;
 	}
 	
 	@Override
 	public boolean isOkayToEndLevel(JaroModel model) {
-		int countEmptyBushes = model.getGrid().countPieces(BUSH_TYPE_ID, BUSH_EMPTY_STATE);
-		return countEmptyBushes == 0;
+		List<Piece> bushes = model.getGrid().getPieces(BUSH_TYPE_ID, null, null);
+		for (Piece bush: bushes) {
+			if (!BUSH_WITH_BIRD_STATE.equals(bush.getState())) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 }

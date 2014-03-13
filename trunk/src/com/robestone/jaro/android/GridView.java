@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -31,6 +32,7 @@ import com.robestone.jaro.Piece;
  */
 public class GridView extends SurfaceView implements SurfaceHolder.Callback {
 
+	private Random random = new Random();
 	private JaroAndroidResources resources;
 	private JaroActivity activity;
 	private SpriteAnimationThread spriteAnimationThread;
@@ -173,6 +175,8 @@ public class GridView extends SurfaceView implements SurfaceHolder.Callback {
 				if (info == null) {
 					info = new CellInfo();
 					info.spriteKey = spriteKey;
+					int frameCount = a.getNumberOfFrames();
+					info.currentFrame = (int) (random.nextFloat() * (frameCount - 1));
 					pieceAnimations.put(piece.getId(), info);
 				}
 				// see if it's time to change to next frame or not
@@ -180,9 +184,16 @@ public class GridView extends SurfaceView implements SurfaceHolder.Callback {
 				if (info.frameDrawTime == -1) {
 					next = true;
 				} else {
-					long requiredDuration = a.getDuration(info.currentFrame);
-					long actualDuration = System.currentTimeMillis() - info.frameDrawTime;
-					if (actualDuration >= requiredDuration) {
+					// trying to add additional random element to movement behavior
+					try {
+						long requiredDuration = (long) (a.getDuration(info.currentFrame) * (random.nextBoolean() ? 1.05f : .95f));
+						long actualDuration = System.currentTimeMillis() - info.frameDrawTime;
+						if (actualDuration >= requiredDuration) {
+							next = true;
+						}
+					} catch (ArrayIndexOutOfBoundsException e) {
+						// this exception happens when (for example) we start the level over, or undo, and the piece it's reverting to has more frames
+						// Log.e("GridView", "ArrayIndexOutOfBounds: " + piece + "/" + id + "/" + spriteKey);
 						next = true;
 					}
 				}
