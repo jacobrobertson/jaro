@@ -5,4 +5,8 @@
 	>
 	<item android:drawable="@drawable/bush_with_bird1" android:duration="3350" />
 	<item android:drawable="@drawable/bush_with_bird2" android:duration="2850" />
+	<item android:drawable="@drawable/bush_with_bird1" android:duration="350" />
+	<item android:drawable="@drawable/bush_with_bird2" android:duration="850" />
+	<item android:drawable="@drawable/bush_with_bird1" android:duration="350" />
+	<item android:drawable="@drawable/bush_with_bird2" android:duration="850" />
 </animation-list>

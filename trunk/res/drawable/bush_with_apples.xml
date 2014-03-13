@@ -5,4 +5,8 @@
 	>
 	<item android:drawable="@drawable/bush_with_apples1" android:duration="3050" />
 	<item android:drawable="@drawable/bush_with_apples2" android:duration="2550" />
+	<item android:drawable="@drawable/bush_with_apples1" android:duration="150" />
+	<item android:drawable="@drawable/bush_with_apples2" android:duration="550" />
+	<item android:drawable="@drawable/bush_with_apples1" android:duration="150" />
+	<item android:drawable="@drawable/bush_with_apples2" android:duration="550" />
 </animation-list>

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/choose_level"
-          android:title="@string/choose_level" android:icon="@android:drawable/ic_menu_more"/>
+          android:title="@string/choose_level" android:icon="@android:drawable/ic_menu_more" android:showAsAction="always" android:enabled="true" android:visible="true"/>
     <item android:id="@+id/choose_game_type"
-          android:title="@string/choose_game" android:icon="@android:drawable/ic_menu_more"/>
+          android:title="@string/choose_game" android:icon="@android:drawable/ic_menu_more" android:showAsAction="always" android:enabled="true" android:visible="true"/>
     <item android:id="@+id/quit"
-          android:title="@string/quit" android:icon="@android:drawable/ic_menu_close_clear_cancel"/>
+          android:title="@string/quit" android:icon="@android:drawable/ic_menu_close_clear_cancel" android:showAsAction="always" android:enabled="true" android:visible="true"/>
 </menu>
