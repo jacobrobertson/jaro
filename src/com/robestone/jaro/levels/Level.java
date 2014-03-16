@@ -12,8 +12,10 @@ public class Level {
 	private String levelKey;
 	private String levelCaption;
 	private String stageKey;
-//	private boolean unlocked;
 	private String levelDataFormatType;
+
+	private boolean unlocked;
+	private boolean passed;
 	
 	// these are only used in sokoban - but might be used later in the compressed format
 	private int cols;
@@ -27,7 +29,6 @@ public class Level {
 		this.levelDataFormatType = levelDataFormatType;
 	}
 
-	/*
 	public boolean isUnlocked() {
 		return unlocked;
 	}
@@ -35,7 +36,14 @@ public class Level {
 	public void setUnlocked(boolean unlocked) {
 		this.unlocked = unlocked;
 	}
-	*/
+
+	public boolean isPassed() {
+		return passed;
+	}
+
+	public void setPassed(boolean passed) {
+		this.passed = passed;
+	}
 
 	/**
 	 * Must be unique?

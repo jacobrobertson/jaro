@@ -20,7 +20,7 @@ public class SimpleFlowTest extends TestCase {
 		controller = new JaroController();
 		controller.getPieceRules().add(new LevelPasserPreventer());
 		JaroAssets assets = new JaroFileAssets("src-test/resources");
-		HtmlResources resources = new HtmlResources(assets);
+		HtmlResources resources = new HtmlResources(assets, new LevelPersisterMock());
 		game = new JaroGame(new JaroModel(resources),  new JaroView(), controller, new LevelPersisterMock(), resources);
 		JaroModel model = game.getModel();
 		

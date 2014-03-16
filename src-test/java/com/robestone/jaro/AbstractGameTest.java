@@ -22,7 +22,7 @@ public abstract class AbstractGameTest extends TestCase {
 		controller = new JaroController();
 		controller.getPieceRules().add(new LevelPasserPreventer());
 		JaroAssets assets = new JaroFileAssets("src-test/resources");
-		JaroResources resources = new HtmlResources(assets);
+		JaroResources resources = new HtmlResources(assets, new LevelPersisterMock());
 		game = new JaroGame(new JaroModel(resources), new JaroView(), controller,
 				new LevelPersisterMock(), resources);
 		
