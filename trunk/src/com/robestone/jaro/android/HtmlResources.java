@@ -10,6 +10,7 @@ import com.robestone.jaro.Grid;
 import com.robestone.jaro.Piece;
 import com.robestone.jaro.levels.JaroAssets;
 import com.robestone.jaro.levels.Level;
+import com.robestone.jaro.levels.LevelPersister;
 import com.robestone.jaro.levels.Stage;
 import com.robestone.jaro.levels.Utils;
 import com.robestone.jaro.piecerules.JaroPieceRules;
@@ -20,12 +21,13 @@ public class HtmlResources extends JaroAndroidResources {
 	public static final String DATA_TYPE = "html";
 
 	private Pattern linePattern = Pattern.compile("<td>(.*?)</td>");
-	private Pattern imgPattern = Pattern.compile("/drawable/(.*?)\\.png");
+	private Pattern imgPattern = Pattern.compile("/drawable.*?/(.*?)\\.png");
 	private Pattern filePattern = Pattern.compile("<table class=\"level.*?\">(.*?)</table>");
 
 	private JaroAssets assets;
 	
-	public HtmlResources(JaroAssets assets) {
+	public HtmlResources(JaroAssets assets, LevelPersister levelPersister) {
+		super(levelPersister);
 		this.assets = assets;
 	}
 
@@ -33,8 +35,10 @@ public class HtmlResources extends JaroAndroidResources {
 	List<Stage> doGetStages() {
 		String[] names = getSortedFileNames(JARO_ASSETS_DIR);
 		List<Stage> stages = new ArrayList<Stage>();
+		int count = 0;
 		for (String name: names) {
 			Stage s = parseStage(name);
+			s.setStageIndex(count++);
 			stages.add(s);
 		}
 		return stages;

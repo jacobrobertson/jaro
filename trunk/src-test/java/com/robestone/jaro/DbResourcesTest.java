@@ -14,7 +14,7 @@ public class DbResourcesTest extends TestCase {
 	
 	public void testParseStages() throws IOException {
 		JaroAssets assets = new JaroFileAssets(ASSETS_DIR);
-		DbResources resources = new DbResources(assets);
+		DbResources resources = new DbResources(assets, new LevelPersisterMock());
 		
 		assertEquals("Alberto", resources.getStage(1).getStageKey());
 		assertEquals("Alberto Garcia 1", resources.getStage(2).getCaption());
@@ -34,7 +34,7 @@ sokoboxes_plus_04:14:12
 	// 2_8w2_2w2f
 	public void testParseGrid() throws Exception {
 		JaroAssets assets = new JaroFileAssets(ASSETS_DIR);
-		DbResources resources = new DbResources(assets);
+		DbResources resources = new DbResources(assets, new LevelPersisterMock());
 		Level level = resources.getLevel("Sasquatch__V", 3);
 		String gs = resources.getGridString(level);
 		System.out.println(gs);

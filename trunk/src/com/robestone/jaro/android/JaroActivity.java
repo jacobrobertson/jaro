@@ -37,6 +37,8 @@ public class JaroActivity extends Activity {
 		Object data = getLastNonConfigurationInstance();
 		if (data instanceof JaroAndroidGame) {
 			game = (JaroAndroidGame) data;
+			// this is required when someone tilts the screen when a menu is open
+			game.getController().startAcceptingMoves();
 		} else {
 			createGame();
 		}
@@ -59,9 +61,9 @@ public class JaroActivity extends Activity {
 		JaroAndroidResources resources;
 		String gameType = prefs.getGameType();
 		if (HtmlResources.JARO_GAME_TYPE.equals(gameType)) {
-			resources = new HtmlResources(assets);
+			resources = new HtmlResources(assets, prefs);
 		} else {
-			resources = new DbResources(assets);
+			resources = new DbResources(assets, prefs);
 		}
 		game = new JaroAndroidGame(this, resources);
 	}
@@ -190,14 +192,14 @@ public class JaroActivity extends Activity {
     		if (stage1 == null) {
     			stage1 = stage;
     		}
-    		boolean stageUnlocked = showAll || levelManager.isStageUnlocked(stage);
+    		boolean stageUnlocked = showAll || stage.isUnlocked();
     		if (!stageUnlocked) {
     			break;
     		}
     		String caption = stage.getCaption();
-    		if (levelManager.isStagePassed(stage)) {
+    		if (stage.isPassed()) {
     			caption = "* " + caption;
-    		} else if (levelManager.isStageWorkedOn(stage)) {
+    		} else if (stage.isWorkedOn()) {
     			caption = "+ " + caption;
     		}
        		stageCaptions.add(caption);
@@ -239,12 +241,12 @@ public class JaroActivity extends Activity {
 		boolean showAll = levelManager.isShowAllLevels();
 		for (int i = 0; i < size; i++) {
     		Level level = resources.getLevel(stage.getStageKey(), i);
-    		boolean unlocked = showAll || game.getModel().getLevelManager().isLevelUnlocked(level);
+    		boolean unlocked = showAll || level.isUnlocked();
     		if (!unlocked) {
     			break;
     		}
     		String caption = ((i + 1) + ". " + level.getCaption());
-    		if (game.getModel().getLevelManager().isLevelPassed(level)) {
+    		if (level.isPassed()) {
     			caption = "* " + caption;
     		}
     		levelCaptions.add(caption);
@@ -282,28 +284,48 @@ public class JaroActivity extends Activity {
 			Thread.sleep(500);
 		} catch (InterruptedException e) {
 		}
-		
+		LevelManager levelManager = game.getModel().getLevelManager();
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
     	builder.setTitle(getString(R.string.level_passed) + "\n" + getString(R.string.next_up));
-    	Level nextLevel = game.getModel().getLevelManager().getNextLevel();
+    	Level[] nextLevels = levelManager.getNextLevels();
+    	Level nextLevel = nextLevels[0];
     	String levelCaption = nextLevel.getCaption();
     	
-    	/* TODO add this back - but there's a serious performance issue in the way the DbResources is working
-    	final List<Stage> unlockedStages = game.getModel().getLevelManager().getOtherUnlockedStages(nextLevel.getStageKey());
+    	final List<Stage> unlockedStages = levelManager.getOtherUnlockedStages(nextLevel.getStageKey());
     	
-    	String[] items = new String[unlockedStages.size() + 1];
+    	boolean twoLevelsTemp = false;
+    	Level nextUnlockedLevelTemp = null;
+    	int levelsCount = 1;
+    	if (nextLevels.length > 1) {
+    		nextUnlockedLevelTemp = nextLevels[1];
+    		twoLevelsTemp = true;
+    		levelsCount++;
+    	}
+    	final Level nextUnlockedLevel = nextUnlockedLevelTemp;
+    	final boolean twoLevels = twoLevelsTemp;
+    	
+    	String[] items = new String[unlockedStages.size() + levelsCount];
     	int i = 0;
     	items[i++] = levelCaption;
+    	if (twoLevels) {
+    		items[i++] = nextUnlockedLevel.getCaption();
+    	}
     	for (Stage stage: unlockedStages) {
     		items[i++] = stage.getCaption();
     	}
-    	*/
-    	String[] items = { levelCaption };
     	builder.setItems(items, new DialogInterface.OnClickListener() {
     	    public void onClick(DialogInterface dialog, int item) {
-//    	    	if (item > 0) {
-//    	    		showChooseLevelMenu(unlockedStages.get(item - 1));
-//    	    	}
+    	    	if (item > 0) {
+    	    		if (twoLevels) {
+    	    			if (item == 1) {
+    	    				game.getController().selectLevel(nextUnlockedLevel);
+    	    			} else {
+        	    			showChooseLevelMenu(unlockedStages.get(item - 2));
+    	    			}
+    	    		} else {
+    	    			showChooseLevelMenu(unlockedStages.get(item - 1));
+    	    		}
+    	    	}
     	    	passLevelMenuDone();
     	    }
     	});

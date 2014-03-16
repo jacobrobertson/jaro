@@ -21,6 +21,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.robestone.jaro.JaroFileAssets;
+import com.robestone.jaro.LevelPersisterMock;
 import com.robestone.jaro.android.DbResources;
 import com.robestone.jaro.levels.SokobanLevelParserHelper.FileEntryIndex;
 
@@ -76,7 +77,7 @@ public class SokobanImporter {
 	}
 	private void addRowAndColumn(List<FileEntryIndex> infos, String rootDir) {
 		JaroAssets assets = new JaroFileAssets(rootDir);
-		DbResources resources = new DbResources(assets);
+		DbResources resources = new DbResources(assets, new LevelPersisterMock());
 		for (FileEntryIndex info: infos) {
 			for (Level level: resources.getLevels(info.stage)) {
 				if (level.getLevelKey().equals(info.level)) {

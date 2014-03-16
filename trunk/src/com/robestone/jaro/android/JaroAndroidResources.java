@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.robestone.jaro.levels.JaroResources;
 import com.robestone.jaro.levels.Level;
+import com.robestone.jaro.levels.LevelPersister;
 import com.robestone.jaro.levels.Stage;
 import com.robestone.jaro.levels.Utils;
 
@@ -25,7 +26,13 @@ public abstract class JaroAndroidResources implements JaroResources {
 	
 	private List<Stage> stages;
 	private Map<String, List<Level>> levels = new HashMap<String, List<Level>>();
+	
+	private LevelPersister levelPersister;
 
+	public JaroAndroidResources(LevelPersister levelPersister) {
+		this.levelPersister = levelPersister;
+	}
+	
 	@Override
 	public final Iterable<Stage> getStages() {
 		return getStagesList();
@@ -33,6 +40,12 @@ public abstract class JaroAndroidResources implements JaroResources {
 	private List<Stage> getStagesList() {
 		if (stages == null) {
 			stages = doGetStages();
+			for (Stage stage: stages) {
+				levelPersister.fillStage(stage);
+				if (stage.getStageIndex() == 0) {
+					stage.setUnlocked(true);
+				}
+			}
 		}
 		return stages;
 	}
@@ -53,9 +66,22 @@ public abstract class JaroAndroidResources implements JaroResources {
 		return getLevelsList(stageKey);
 	}
 	private List<Level> getLevelsList(String stageKey) {
+		Stage stage = getStage(0);
+		boolean isFirstStage = stage.getStageKey().equals(stageKey);
 		List<Level> list = levels.get(stageKey);
 		if (list == null) {
 			list = doGetLevels(stageKey);
+			int count = 0;
+			for (Level level: list) {
+				levelPersister.fillLevel(level);
+				// this isn't a fantastic place to put this, but there' no other logical place
+				// we just want to ensure that the first time someone plays, the first level is guaranteed to be unlocked.
+				if (isFirstStage && count == 0) {
+					levelPersister.setLevelUnlocked(level.getLevelKey());
+					level.setUnlocked(true);
+				}
+				count++;
+			}
 			levels.put(stageKey, list);
 		}
 		return list;

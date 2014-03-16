@@ -11,7 +11,7 @@ public class HtmlResourcesTest extends TestCase {
 
 	public void testHtmlResources() {
 		JaroAssets assets = new JaroFileAssets("src-test/resources");
-		HtmlResources resources = new HtmlResources(assets);
+		HtmlResources resources = new HtmlResources(assets, new LevelPersisterMock());
 		Stage s2 = resources.getStage(1);
 		assertEquals("Scary Spiders", s2.getCaption());
 		

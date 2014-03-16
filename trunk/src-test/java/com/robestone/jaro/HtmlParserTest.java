@@ -35,7 +35,7 @@ public class HtmlParserTest extends TestCase {
 		}
 		in.close();
 		JaroAssets assets = new JaroFileAssets("");
-		HtmlResources parser = new HtmlResources(assets);
+		HtmlResources parser = new HtmlResources(assets, new LevelPersisterMock());
 		Grid g = parser.parseGrid(buf.toString(), null);
 		System.out.println(file);
 		SokobanParserTest.outputGrid(g);

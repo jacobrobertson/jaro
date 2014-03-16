@@ -11,6 +11,7 @@ import java.util.List;
 import com.robestone.jaro.Grid;
 import com.robestone.jaro.levels.JaroAssets;
 import com.robestone.jaro.levels.Level;
+import com.robestone.jaro.levels.LevelPersister;
 import com.robestone.jaro.levels.SokobanLevelParserHelper;
 import com.robestone.jaro.levels.Stage;
 
@@ -25,7 +26,8 @@ public class DbResources extends JaroAndroidResources {
 	private SokobanLevelParserHelper parser = new SokobanLevelParserHelper(false);
 	private JaroAssets assets;
 
-	public DbResources(JaroAssets assets) {
+	public DbResources(JaroAssets assets, LevelPersister levelPersister) {
+		super(levelPersister);
 		this.assets = assets;
 	}
 

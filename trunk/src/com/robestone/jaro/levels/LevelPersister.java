@@ -14,7 +14,22 @@ public interface LevelPersister {
 
 	boolean isLevelPassed(String levelKey);
 	void setLevelPassed(String levelKey);
+
+	boolean isLevelUnlocked(String levelKey);
+	void setLevelUnlocked(String levelKey);
 	
+	boolean isStagePassed(String stageKey);
+	void setStagePassed(String stageKey);
+	
+	boolean isStageWorkedOn(String stageKey);
+	void setStageWorkedOn(String stageKey);
+
+	boolean isStageUnlocked(String stageKey);
+	void setStageUnlocked(String stageKey);
+
 	String getGameType();
+	
+	void fillStage(Stage stage);
+	void fillLevel(Level level);
 
 }
