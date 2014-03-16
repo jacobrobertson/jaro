@@ -16,9 +16,9 @@
    version="1.1"
    inkscape:version="0.48.4 r9939"
    sodipodi:docname="BushLayers.svg"
-   inkscape:export-filename="C:\Users\Jacob\eclipse-workspace-silver\jaro\artwork\bush\72\bush_with_apples2.png"
-   inkscape:export-xdpi="8.6400003"
-   inkscape:export-ydpi="8.6400003">
+   inkscape:export-filename="C:\Users\Jacob\eclipse-workspace-silver\jaro\res\drawable-nodpi\bush_empty2.png"
+   inkscape:export-xdpi="11.52"
+   inkscape:export-ydpi="11.52">
   <defs
      id="defs4">
     <pattern
@@ -1487,17 +1487,17 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.49497475"
-     inkscape:cx="-139.8135"
-     inkscape:cy="289.80224"
+     inkscape:zoom="0.7"
+     inkscape:cx="14.102611"
+     inkscape:cy="414.32788"
      inkscape:document-units="px"
      inkscape:current-layer="g3308"
      showgrid="false"
-     inkscape:window-width="1920"
-     inkscape:window-height="1017"
-     inkscape:window-x="-8"
-     inkscape:window-y="-8"
-     inkscape:window-maximized="1"
+     inkscape:window-width="934"
+     inkscape:window-height="875"
+     inkscape:window-x="440"
+     inkscape:window-y="47"
+     inkscape:window-maximized="0"
      showborder="true"
      inkscape:showpageshadow="false" />
   <metadata
@@ -1508,7 +1508,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -1585,7 +1585,7 @@
     </g>
   </g>
   <g
-     style="display:none"
+     style="display:inline"
      inkscape:label="Bush 2"
      id="g3243"
      inkscape:groupmode="layer">
@@ -1648,7 +1648,7 @@
     </g>
   </g>
   <g
-     style="display:inline"
+     style="display:none"
      inkscape:label="Bush lightened"
      id="g6163"
      inkscape:groupmode="layer">
@@ -2173,7 +2173,7 @@
      inkscape:groupmode="layer"
      id="g3308"
      inkscape:label="Bird 2 - blue"
-     style="display:inline">
+     style="display:none">
     <g
        transform="matrix(1.2258652,0.51213657,-0.53051644,1.2698598,303.55906,-454.1194)"
        id="g3310"
