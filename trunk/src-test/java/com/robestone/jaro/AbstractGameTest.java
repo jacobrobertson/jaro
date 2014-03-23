@@ -19,7 +19,7 @@ public abstract class AbstractGameTest extends TestCase {
 
 	@Override
 	protected void setUp() throws Exception {
-		controller = new JaroController();
+		controller = new JaroController(SoundPlayerMock.INSTANCE);
 		controller.getPieceRules().add(new LevelPasserPreventer());
 		JaroAssets assets = new JaroFileAssets("src-test/resources");
 		JaroResources resources = new HtmlResources(assets, new LevelPersisterMock());

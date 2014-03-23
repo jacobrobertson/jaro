@@ -17,7 +17,7 @@ public class SimpleFlowTest extends TestCase {
 	
 	@Override
 	protected void setUp() throws Exception {
-		controller = new JaroController();
+		controller = new JaroController(SoundPlayerMock.INSTANCE);
 		controller.getPieceRules().add(new LevelPasserPreventer());
 		JaroAssets assets = new JaroFileAssets("src-test/resources");
 		HtmlResources resources = new HtmlResources(assets, new LevelPersisterMock());
