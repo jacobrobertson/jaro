@@ -87,8 +87,8 @@ public class AndroidSoundPlayer implements SoundPlayer, AudioManager.OnAudioFocu
 	}
 	
 	private static final int NO_SOUND = -666;
-	private static final float MUSIC_VOLUME = .25f;
-	private static final float EFFECTS_VOLUME = .65f;
+	private static final float MUSIC_VOLUME = .1f;
+	private static final float EFFECTS_VOLUME = 1f;
 	
 	private MediaPlayer levelPlayer;
 	private boolean levelPlayerPaused;
@@ -156,7 +156,9 @@ public class AndroidSoundPlayer implements SoundPlayer, AudioManager.OnAudioFocu
 	}
 	private void playAction(int soundId) {
 		try {
-			actionPlayer.play(soundId, EFFECTS_VOLUME, EFFECTS_VOLUME, 1, 0, 1f);
+			int stream = actionPlayer.play(soundId, EFFECTS_VOLUME, EFFECTS_VOLUME, 1, 0, 1f);
+			// TODO probably not necessary
+			actionPlayer.setVolume(stream, EFFECTS_VOLUME, EFFECTS_VOLUME);
 		} catch (RuntimeException re) {
 			// just swallow for now - need to determine if this is an issue
 		}
