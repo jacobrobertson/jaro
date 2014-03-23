@@ -4,7 +4,15 @@
 	android:antialias="true"
 	>
 	<item android:drawable="@drawable/jaro1" android:duration="150" />
-	<item android:drawable="@drawable/jaro2" android:duration="150" />
-	<item android:drawable="@drawable/jaro3" android:duration="150" />
-	<item android:drawable="@drawable/jaro4" android:duration="150" />
+	<item android:drawable="@drawable/jaro2" android:duration="140" />
+	<item android:drawable="@drawable/jaro3" android:duration="130" />
+	<item android:drawable="@drawable/jaro4" android:duration="120" />
+	<item android:drawable="@drawable/jaro5" android:duration="110" />
+	<item android:drawable="@drawable/jaro6" android:duration="100" />
+	<item android:drawable="@drawable/jaro7" android:duration="120" />
+	<item android:drawable="@drawable/jaro8" android:duration="160" />
+	<item android:drawable="@drawable/jaro9" android:duration="180" />
+	<item android:drawable="@drawable/jaro10" android:duration="200" />
+	<item android:drawable="@drawable/jaro11" android:duration="220" />
+	<item android:drawable="@drawable/jaro12" android:duration="190" />
 </animation-list>
