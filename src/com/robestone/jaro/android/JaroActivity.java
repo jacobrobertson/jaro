@@ -33,7 +33,7 @@ public class JaroActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		
 		Object data = getLastNonConfigurationInstance();
 		if (data instanceof JaroAndroidGame) {
 			game = (JaroAndroidGame) data;
@@ -44,6 +44,7 @@ public class JaroActivity extends Activity {
 		}
 		if (game.isActive()) {
 			setContentView(R.layout.main);
+		    getGame().getController().onGameDisplayed();
 		} else {
 			// need to check preferences
 			// TODO might not be good to acquire like this?
@@ -55,6 +56,37 @@ public class JaroActivity extends Activity {
 			}
 		}
 	}
+	@Override
+	protected void onResume() {
+		super.onResume();
+		onDisplayed();
+	}
+	@Override
+	protected void onRestart() {
+		super.onRestart();
+		onDisplayed();
+	}
+	private void onHidden() {
+		getGame().getController().onGameHidden();
+	}
+	private void onDisplayed() {
+		getGame().getController().onGameDisplayed();
+	}
+	@Override
+	protected void onStop() {
+		super.onStop();
+		onHidden();
+	}
+	@Override
+	protected void onPause() {
+		super.onPause();
+		onHidden();
+	}
+	@Override
+	protected void onDestroy() {
+	    super.onDestroy();
+	    onHidden();
+	}
 	private void createGame() {
 		JaroAssets assets = new JaroAndroidAssets(getAssets());
 		JaroPreferences prefs = new JaroPreferences(this);
@@ -65,7 +97,7 @@ public class JaroActivity extends Activity {
 		} else {
 			resources = new DbResources(assets, prefs);
 		}
-		game = new JaroAndroidGame(this, resources);
+		game = new JaroAndroidGame(this, resources, new AndroidSoundPlayer(getApplicationContext()));
 	}
 	void showAbout() {
 		CharSequence aboutMessageText = getResources().getText(R.string.about);
@@ -142,6 +174,7 @@ public class JaroActivity extends Activity {
 	        	game.getController().undoLastMove();
 	        	return true;
 	        case R.id.quit:
+	    	    getGame().getController().onGameHidden();
 	        	finish();
 	            return true;
 	        case R.id.start_level_over:

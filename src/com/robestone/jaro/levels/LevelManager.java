@@ -20,7 +20,7 @@ import java.util.List;
 public class LevelManager {
 
 	private static final float PERCENT_TO_UNLOCK_NEXT = .7f;
-	private static final boolean SHOW_ALL_LEVELS = false;
+	private static final boolean SHOW_ALL_LEVELS = true;
 	
 	private LevelPersister levelPersister;
 	private JaroResources jaroResources;

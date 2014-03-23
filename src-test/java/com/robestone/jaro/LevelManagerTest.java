@@ -16,7 +16,7 @@ public class LevelManagerTest extends TestCase {
 		
 		// loading a blank level manager, we see we go straight to stage 1, level 1
 		JaroResources resources = new HtmlResources(new JaroFileAssets("src-test/resources"), new LevelPersisterMock());
-		JaroGame game = new JaroGame(new JaroModel(resources), new JaroView(), new JaroController(), new LevelPersisterMock(), resources);
+		JaroGame game = new JaroGame(new JaroModel(resources), new JaroView(), new JaroController(SoundPlayerMock.INSTANCE), new LevelPersisterMock(), resources);
 		LevelManager levelManager = game.getModel().getLevelManager();
 		
 		Level level = levelManager.getCurrentLevel();
@@ -80,7 +80,7 @@ public class LevelManagerTest extends TestCase {
 	
 	public void testUnlockedBehavior() {
 		JaroResources resources = new HtmlResources(new JaroFileAssets("src-test/resources"), new LevelPersisterMock());
-		JaroGame game = new JaroGame(new JaroModel(resources), new JaroView(), new JaroController(), new LevelPersisterMock(), resources);
+		JaroGame game = new JaroGame(new JaroModel(resources), new JaroView(), new JaroController(SoundPlayerMock.INSTANCE), new LevelPersisterMock(), resources);
 		LevelManager levelManager = game.getModel().getLevelManager();
 
 		Level l1_1 = levelManager.getLevel("001.bb-1.html");

@@ -8,16 +8,23 @@ import com.robestone.jaro.piecerules.JaroPieceRules;
 public class JaroController {
 	
 	private JaroView view;
+	private SoundPlayer soundPlayer;
 	private JaroModel model;
 	
 	private List<PieceRules> pieceRules = JaroPieceRules.getPieceRules();
 	private boolean isAcceptingMoves;
 
+	public JaroController(SoundPlayer soundPlayer) {
+		this.soundPlayer = soundPlayer;
+	}
+	
 	/**
 	 * Called by the view to indicate that any intermediate menus, etc are ready to go.
 	 */
 	public void startAcceptingMoves() {
 		this.isAcceptingMoves = true;
+		// TODO this is not at all right, but I don't have an API for when to start/stop the sound
+		soundPlayer.levelStarted(null);
 	}
 	public void undoLastMove() {
 		model.undo();
@@ -37,8 +44,10 @@ public class JaroController {
 		
 		Action action = new Action(model.getJaro(), model.getJaroColumn(), model.getJaroRow(), toX, toY);
 		
+		Level level = model.getLevelManager().getCurrentLevel();
 		boolean isLegal = isLegalForGrid(action);
 		if (!isLegal) {
+			// TODO put a sound here - but this should probably never come up - cave walls is what prevents us from going out of grid
 			return false;
 		}
 		
@@ -46,6 +55,7 @@ public class JaroController {
 		for (PieceRules rules: pieceRules) {
 			isLegal = rules.isLegal(action, model);
 			if (!isLegal) {
+				soundPlayer.action(level, rules, action, true);
 				return false;
 			}
 		}
@@ -67,6 +77,7 @@ public class JaroController {
 					for (Action triggeredAction: triggeredActions) {
 						triggeredAction.run(model);
 						model.saveJaroPosition();
+						soundPlayer.action(level, rules, triggeredAction, false);
 						rulesFound = true;
 					}
 				}
@@ -83,6 +94,8 @@ public class JaroController {
 		if (levelEnded) {
 			isAcceptingMoves = false;
 			// inform the other layers
+			Level currentLevel = model.getLevelManager().getCurrentLevel();
+			soundPlayer.levelPassed(currentLevel);
 			view.passedLevel();
 			model.passedLevel();
 		}
@@ -115,6 +128,7 @@ public class JaroController {
 	public void selectLevel(Level level) {
 		model.setLevel(level);
 		view.levelSelected();
+		soundPlayer.levelPassed(level);
 	}
 
 	public void setView(JaroView view) {
@@ -129,5 +143,11 @@ public class JaroController {
 	 */
 	public List<PieceRules> getPieceRules() {
 		return pieceRules;
+	}
+	public void onGameHidden() {
+		soundPlayer.onGameHidden();
+	}
+	public void onGameDisplayed() {
+		soundPlayer.onGameDisplayed();
 	}
 }

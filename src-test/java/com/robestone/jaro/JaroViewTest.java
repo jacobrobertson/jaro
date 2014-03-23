@@ -19,7 +19,7 @@ public class JaroViewTest extends TestCase {
 		JaroAssets assets = new JaroFileAssets("src-test/resources");
 		HtmlResources resources = new HtmlResources(assets, new LevelPersisterMock());
 		
-		JaroGame game = new JaroGame(new JaroModel(resources), new JaroView(), new JaroController(),
+		JaroGame game = new JaroGame(new JaroModel(resources), new JaroView(), new JaroController(SoundPlayerMock.INSTANCE),
 				new LevelPersisterMock(), resources);
 		JaroModel model = game.getModel();
 		
